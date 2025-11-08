@@ -1,23 +1,33 @@
 package buttplug
 
+import "github.com/CockpitCutie/buttplug-go/message"
+
 type Client struct {
-	
+	name string
+	connector Connector
+	msg_recv chan message.Message
+	serverName string
 }
 
 func New(name string) *Client {
-	return nil
+	return &Client{
+		name: name,
+		connector: nil,
+		msg_recv: make(chan message.Message),
+		serverName: "",
+	}
 }
 
 func (c *Client) Connect(connector Connector) error {
-	return nil
+	return connector.Connect(c.msg_recv)
 }
 
 func (c Client) Connected() bool {
-	return false
+	return c.connector != nil && c.Connected()
 }
 
 func (c *Client) Disconnect() error {
-	return nil
+	return c.Disconnect()
 }
 
 func (c *Client) StartScanning() error {
@@ -41,7 +51,7 @@ func (c *Client) Ping() error {
 }
 
 func (c *Client) ServerName() *string {
-	return nil
+	return &c.serverName
 }
 
 type Device struct {}
