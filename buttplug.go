@@ -19,6 +19,7 @@ func New(name string) *Client {
 }
 
 func (c *Client) Connect(connector Connector) error {
+	c.connector = connector
 	err := connector.Connect(c.msg_recv)
 	if err != nil {
 		return err

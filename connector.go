@@ -11,7 +11,7 @@ type Connector interface {
 	Connect(msgRecv map[uint32]chan message.Message) error
 	Connected() bool
 	Disconnect() error
-	Send(msg message.Message)
+	Send(msg message.Message) error
 }
 
 type WebsocketConnector struct {
@@ -51,4 +51,13 @@ func (w *WebsocketConnector) Connected() bool {
 
 func (w *WebsocketConnector) Disconnect() error {
 	return w.conn.Close()
+}
+
+func (w *WebsocketConnector) Send(msg message.Message) error {
+	w.msgRecv[msg.ID()] = make(chan message.Message)
+	serialized, err := message.Serialize(msg)
+	if err != nil {
+		return err
+	}
+	return w.conn.WriteMessage(websocket.TextMessage, []byte(serialized))
 }
