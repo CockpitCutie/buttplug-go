@@ -3,17 +3,17 @@ package buttplug
 import "github.com/CockpitCutie/buttplug-go/message"
 
 type Client struct {
-	name string
-	connector Connector
-	msg_recv chan message.Message
+	name       string
+	connector  Connector
+	msg_recv   chan message.Message
 	serverName string
 }
 
 func New(name string) *Client {
 	return &Client{
-		name: name,
-		connector: nil,
-		msg_recv: make(chan message.Message),
+		name:       name,
+		connector:  nil,
+		msg_recv:   make(chan message.Message),
 		serverName: "",
 	}
 }
@@ -54,4 +54,4 @@ func (c *Client) ServerName() *string {
 	return &c.serverName
 }
 
-type Device struct {}
+type Device struct{}
