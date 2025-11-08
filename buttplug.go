@@ -5,7 +5,7 @@ import "github.com/CockpitCutie/buttplug-go/message"
 type Client struct {
 	name       string
 	connector  Connector
-	msg_recv   chan message.Message
+	msg_recv   map[uint32]chan message.Message
 	serverName string
 }
 
@@ -13,13 +13,31 @@ func New(name string) *Client {
 	return &Client{
 		name:       name,
 		connector:  nil,
-		msg_recv:   make(chan message.Message),
+		msg_recv:   make(map[uint32]chan message.Message),
 		serverName: "",
 	}
 }
 
 func (c *Client) Connect(connector Connector) error {
-	return connector.Connect(c.msg_recv)
+	err := connector.Connect(c.msg_recv)
+	if err != nil {
+		return err
+	}
+	return c.onConnect()
+}
+
+func (c *Client) onConnect() error {
+	msg := &message.RequestServerInfo{
+		ClientName: c.name,
+		MessageVersion: 3,
+	}
+	msg.SetID(1)
+	c.connector.Send(msg)
+	res := <-c.msg_recv[1]
+	if serverInfo, ok := res.(*message.ServerInfo); ok {
+		c.serverName = serverInfo.ServerName
+	}
+	return nil
 }
 
 func (c Client) Connected() bool {
