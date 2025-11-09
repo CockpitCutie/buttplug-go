@@ -4,11 +4,13 @@ import (
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
+// Client represents a Buttplugio client that can connect to a Buttplug server.
 type Client struct {
 	name       string
 	connector  Connector
 	msg_recv   map[uint32]chan message.Message
 	serverName string
+	idCounter  uint32
 }
 
 func New(name string) *Client {
@@ -17,6 +19,7 @@ func New(name string) *Client {
 		connector:  nil,
 		msg_recv:   make(map[uint32]chan message.Message),
 		serverName: "",
+		idCounter:  1,
 	}
 }
 
@@ -30,18 +33,16 @@ func (c *Client) Connect(connector Connector) error {
 }
 
 func (c *Client) onConnect() error {
-	msg := &message.RequestServerInfo{
+	recv, err := c.sendRecv(&message.RequestServerInfo{
 		ClientName:     c.name,
 		MessageVersion: 3,
+	})
+	if err != nil {
+		return err
 	}
-	msg.SetID(1)
-	c.connector.Send(msg)
-	res := <-c.msg_recv[1]
-
-	if serverInfo, ok := res.(*message.ServerInfo); ok {
+	if serverInfo, ok := recv.(*message.ServerInfo); ok {
 		c.serverName = serverInfo.ServerName
 	}
-	println(c.ServerName())
 	return nil
 }
 
@@ -54,14 +55,29 @@ func (c *Client) Disconnect() error {
 }
 
 func (c *Client) StartScanning() error {
+	send := &message.StartScanning{}
+	_, err := c.sendRecv(send)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (c *Client) StopScanning() error {
+	send := &message.StopScanning{}
+	_, err := c.sendRecv(send)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (c *Client) StopAllDevices() error {
+	send := &message.StopAllDevices{}
+	_, err := c.sendRecv(send)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -70,11 +86,31 @@ func (c *Client) Devices() []Device {
 }
 
 func (c *Client) Ping() error {
+	send := &message.Ping{}
+	_, err := c.sendRecv(send)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (c Client) ServerName() string {
 	return c.serverName
+}
+
+func (c *Client) sendRecv(m message.Message) (message.Message, error) {
+	id := c.idCounter
+	c.idCounter++
+	m.SetID(id)
+	err := c.connector.Send(m)
+	if err != nil {
+		return nil, err
+	}
+	recv := <-c.msg_recv[id]
+	if err, ok := recv.(*message.Error); !ok {
+		return err, err.Error()
+	}
+	return recv, nil
 }
 
 type Device struct{}
