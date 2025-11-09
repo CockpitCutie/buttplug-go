@@ -1,7 +1,6 @@
 package buttplug
 
 import (
-
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
@@ -32,13 +31,13 @@ func (c *Client) Connect(connector Connector) error {
 
 func (c *Client) onConnect() error {
 	msg := &message.RequestServerInfo{
-		ClientName: c.name,
+		ClientName:     c.name,
 		MessageVersion: 3,
 	}
 	msg.SetID(1)
 	c.connector.Send(msg)
 	res := <-c.msg_recv[1]
-	
+
 	if serverInfo, ok := res.(*message.ServerInfo); ok {
 		c.serverName = serverInfo.ServerName
 	}
