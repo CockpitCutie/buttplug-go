@@ -1,6 +1,9 @@
 package buttplug
 
-import "github.com/CockpitCutie/buttplug-go/message"
+import (
+
+	"github.com/CockpitCutie/buttplug-go/message"
+)
 
 type Client struct {
 	name       string
@@ -35,9 +38,11 @@ func (c *Client) onConnect() error {
 	msg.SetID(1)
 	c.connector.Send(msg)
 	res := <-c.msg_recv[1]
+	
 	if serverInfo, ok := res.(*message.ServerInfo); ok {
 		c.serverName = serverInfo.ServerName
 	}
+	println(c.ServerName())
 	return nil
 }
 
@@ -46,7 +51,7 @@ func (c Client) Connected() bool {
 }
 
 func (c *Client) Disconnect() error {
-	return c.Disconnect()
+	return c.connector.Disconnect()
 }
 
 func (c *Client) StartScanning() error {
@@ -69,8 +74,8 @@ func (c *Client) Ping() error {
 	return nil
 }
 
-func (c *Client) ServerName() *string {
-	return &c.serverName
+func (c Client) ServerName() string {
+	return c.serverName
 }
 
 type Device struct{}

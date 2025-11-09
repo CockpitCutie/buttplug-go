@@ -26,7 +26,7 @@ type Device struct {
 	DeviceIndex uint
 	DeviceMessageTimingGap *uint
 	DeviceDisplayName *string
-	DeviceMessages map[string]any
+	DeviceMessages map[string]Attributes
 }
 
 type Attributes struct {
@@ -36,6 +36,15 @@ type Attributes struct {
 	SensorType *string
 	SensorRange [][2]int
 	EndPoints []string
+}
+
+type DeviceAdded struct {
+	message
+	DeviceName string
+	DeviceIndex uint
+	DeviceMessageTimingGap *uint
+	DeviceDisplayName *string
+	DeviceMessages map[string]Attributes
 }
 
 type DeviceRemoved struct {

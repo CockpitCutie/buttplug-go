@@ -1,6 +1,7 @@
 package buttplug
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/CockpitCutie/buttplug-go/message"
@@ -42,7 +43,31 @@ func (w *WebsocketConnector) Connect(msgRecv map[uint32]chan message.Message) er
 		w.isOpen = false
 		return w.conn.WriteMessage(websocket.CloseMessage, []byte{})
 	})
+	go w.listenLoop()
 	return nil
+}
+
+func (w *WebsocketConnector) listenLoop() {
+	for {
+		println("Hi")
+		kind, buf, err := w.conn.ReadMessage()
+		if err != nil {
+			println("faield to read")
+			break
+		} 
+		fmt.Printf("recv: %s", buf)
+		if kind != websocket.TextMessage {
+			continue
+		}
+		deserialized, err := message.Deserialize(buf)
+		if err != nil {
+			continue
+		}
+		if _, ok := w.msgRecv[deserialized.ID()]; !ok {
+			w.msgRecv[deserialized.ID()] = make(chan message.Message)
+		}
+		w.msgRecv[deserialized.ID()]<-deserialized
+	}
 }
 
 func (w *WebsocketConnector) Connected() bool {
