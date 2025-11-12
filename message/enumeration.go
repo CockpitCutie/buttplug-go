@@ -26,7 +26,7 @@ type Device struct {
 	DeviceIndex uint
 	DeviceMessageTimingGap *uint
 	DeviceDisplayName *string
-	DeviceMessages map[string]Attributes
+	DeviceMessages map[string][]Attributes
 }
 
 type Attributes struct {
