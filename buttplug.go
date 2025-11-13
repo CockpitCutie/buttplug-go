@@ -1,6 +1,9 @@
 package buttplug
 
 import (
+	"fmt"
+
+	"github.com/CockpitCutie/buttplug-go/device"
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
@@ -55,8 +58,7 @@ func (c *Client) Disconnect() error {
 }
 
 func (c *Client) StartScanning() error {
-	send := &message.StartScanning{}
-	_, err := c.sendRecv(send)
+	_, err := c.sendRecv(&message.StartScanning{})
 	if err != nil {
 		return err
 	}
@@ -64,8 +66,7 @@ func (c *Client) StartScanning() error {
 }
 
 func (c *Client) StopScanning() error {
-	send := &message.StopScanning{}
-	_, err := c.sendRecv(send)
+	_, err := c.sendRecv(&message.StopScanning{})
 	if err != nil {
 		return err
 	}
@@ -73,21 +74,31 @@ func (c *Client) StopScanning() error {
 }
 
 func (c *Client) StopAllDevices() error {
-	send := &message.StopAllDevices{}
-	_, err := c.sendRecv(send)
+	_, err := c.sendRecv(&message.StopAllDevices{})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *Client) Devices() []Device {
-	return nil
+func (c *Client) Devices() ([]device.Device, error) {
+	devicelist, err := c.sendRecv(&message.RequestDevicelist{})
+	if err != nil {
+		return nil, err
+	}
+	if devicelist, ok := devicelist.(*message.DeviceList); ok {
+		var devices []device.Device
+		for _, d := range devicelist.Devices {
+			devices = append(devices, device.FromMessage(d))
+		}
+		return devices, nil
+	}
+	return nil, fmt.Errorf("expected DeviceList, found %T", devicelist)
+	
 }
 
 func (c *Client) Ping() error {
-	send := &message.Ping{}
-	_, err := c.sendRecv(send)
+	_, err := c.sendRecv(&message.Ping{})
 	if err != nil {
 		return err
 	}
@@ -110,7 +121,6 @@ func (c *Client) sendRecv(m message.Message) (message.Message, error) {
 	if err, ok := recv.(*message.Error); !ok {
 		return err, err.Error()
 	}
+	delete(c.msg_recv, id)
 	return recv, nil
 }
-
-type Device struct{}

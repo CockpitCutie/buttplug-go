@@ -1,11 +1,11 @@
 package device
 
 type Actuator struct {
-	Index     uint
-	Descriptor      string
-	Type      ActuatorType
-	StepCount uint
-	Command   Command
+	Index      uint
+	Descriptor string
+	Type       ActuatorType
+	StepCount  uint
+	Command    Command
 }
 
 type ActuatorType string

@@ -11,8 +11,8 @@ type Device struct {
 	sensors          []Sensor
 }
 
-func FromMessage(msg message.Device) *Device {
-	device := &Device{
+func FromMessage(msg message.Device) Device {
+	device := Device{
 		Name:             msg.DeviceName,
 		Index:            msg.DeviceIndex,
 		MessageTimingGap: msg.DeviceMessageTimingGap,
@@ -55,14 +55,19 @@ func (d *Device) addSensors(cmd Command, attrs []message.Attributes) {
 }
 
 func (d *Device) Actuators() []Actuator {
-	return nil
+	return d.actuators
 }
 
 func (d *Device) Sensors() []Sensor {
-	return nil
+	return d.sensors
 }
 
 func (d *Device) Vibrate(intensity float64) error {
+	for _, actuator := range d.actuators {
+		if actuator.Type == VibrateActuator {
+			_ = actuator
+		}
+	}
 	return nil
 }
 
