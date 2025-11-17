@@ -12,7 +12,7 @@ type ScanningFinished struct {
 	message
 }
 
-type RequestDevicelist struct {
+type RequestDeviceList struct {
 	message
 }
 

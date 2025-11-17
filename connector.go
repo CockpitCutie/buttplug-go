@@ -49,13 +49,12 @@ func (w *WebsocketConnector) Connect(msgRecv map[uint32]chan message.Message) er
 
 func (w *WebsocketConnector) listenLoop() {
 	for {
-		println("Hi")
 		kind, buf, err := w.conn.ReadMessage()
 		if err != nil {
-			println("faield to read")
+			println("failed to read")
 			break
 		}
-		fmt.Printf("recv: %s", buf)
+		fmt.Printf("recv: `%s`\n", buf)
 		if kind != websocket.TextMessage {
 			continue
 		}
@@ -81,6 +80,7 @@ func (w *WebsocketConnector) Disconnect() error {
 func (w *WebsocketConnector) Send(msg message.Message) error {
 	w.msgRecv[msg.ID()] = make(chan message.Message)
 	serialized, err := message.Serialize(msg)
+	fmt.Printf("sending: `%s`\n", serialized)
 	if err != nil {
 		return err
 	}

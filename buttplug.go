@@ -82,7 +82,7 @@ func (c *Client) StopAllDevices() error {
 }
 
 func (c *Client) Devices() ([]device.Device, error) {
-	devicelist, err := c.sendRecv(&message.RequestDevicelist{})
+	devicelist, err := c.sendRecv(&message.RequestDeviceList{})
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,6 @@ func (c *Client) Devices() ([]device.Device, error) {
 		return devices, nil
 	}
 	return nil, fmt.Errorf("expected DeviceList, found %T", devicelist)
-	
 }
 
 func (c *Client) Ping() error {
@@ -118,7 +117,7 @@ func (c *Client) sendRecv(m message.Message) (message.Message, error) {
 		return nil, err
 	}
 	recv := <-c.msg_recv[id]
-	if err, ok := recv.(*message.Error); !ok {
+	if err, ok := recv.(*message.Error); ok {
 		return err, err.Error()
 	}
 	delete(c.msg_recv, id)

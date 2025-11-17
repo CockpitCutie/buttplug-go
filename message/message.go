@@ -79,7 +79,7 @@ func Deserialize(b []byte) (Message, error) {
 			err = json.Unmarshal(value, &scanFinished)
 			return &scanFinished, err
 		case "RequestDevicelist":
-			var reqDevList RequestDevicelist
+			var reqDevList RequestDeviceList
 			err = json.Unmarshal(value, &reqDevList)
 			return &reqDevList, err
 		case "DeviceList":
