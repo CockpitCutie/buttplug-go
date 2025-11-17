@@ -21,9 +21,10 @@ func FromMessage(msg message.Device) Device {
 	for cmdLabel, attrs := range msg.DeviceMessages {
 		cmd := Command(cmdLabel)
 		isActuator := cmd == ScalarCmd || cmd == LinearCmd || cmd == RotateCmd
+		isSensor := cmd == SensorReadCmd || cmd == SensorSubscribeCmd
 		if isActuator {
 			device.addActuators(cmd, attrs)
-		} else {
+		} else if isSensor {
 			device.addSensors(cmd, attrs)
 		}
 	}
@@ -65,7 +66,7 @@ func (d *Device) Sensors() []Sensor {
 func (d *Device) Vibrate(intensity float64) error {
 	for _, actuator := range d.actuators {
 		if actuator.Type == VibrateActuator {
-			_ = actuator
+			
 		}
 	}
 	return nil
@@ -99,4 +100,9 @@ const (
 	LinearCmd          Command = "LinearCmd"
 	SensorReadCmd      Command = "SensorReadCmd"
 	SensorSubscribeCmd Command = "SensorSubscribeCmd"
+	StopDeviceCmd      Command = ""
 )
+
+type MessageSender interface {
+	
+}

@@ -13,7 +13,6 @@ type Client struct {
 	connector  Connector
 	msg_recv   map[uint32]chan message.Message
 	serverName string
-	idCounter  uint32
 }
 
 func New(name string) *Client {
@@ -22,7 +21,6 @@ func New(name string) *Client {
 		connector:  nil,
 		msg_recv:   make(map[uint32]chan message.Message),
 		serverName: "",
-		idCounter:  1,
 	}
 }
 
@@ -36,7 +34,7 @@ func (c *Client) Connect(connector Connector) error {
 }
 
 func (c *Client) onConnect() error {
-	recv, err := c.sendRecv(&message.RequestServerInfo{
+	recv, err := c.connector.SendRecv(&message.RequestServerInfo{
 		ClientName:     c.name,
 		MessageVersion: 3,
 	})
@@ -58,7 +56,7 @@ func (c *Client) Disconnect() error {
 }
 
 func (c *Client) StartScanning() error {
-	_, err := c.sendRecv(&message.StartScanning{})
+	_, err := c.connector.SendRecv(&message.StartScanning{})
 	if err != nil {
 		return err
 	}
@@ -66,7 +64,7 @@ func (c *Client) StartScanning() error {
 }
 
 func (c *Client) StopScanning() error {
-	_, err := c.sendRecv(&message.StopScanning{})
+	_, err := c.connector.SendRecv(&message.StopScanning{})
 	if err != nil {
 		return err
 	}
@@ -74,7 +72,7 @@ func (c *Client) StopScanning() error {
 }
 
 func (c *Client) StopAllDevices() error {
-	_, err := c.sendRecv(&message.StopAllDevices{})
+	_, err := c.connector.SendRecv(&message.StopAllDevices{})
 	if err != nil {
 		return err
 	}
@@ -82,7 +80,7 @@ func (c *Client) StopAllDevices() error {
 }
 
 func (c *Client) Devices() ([]device.Device, error) {
-	devicelist, err := c.sendRecv(&message.RequestDeviceList{})
+	devicelist, err := c.connector.SendRecv(&message.RequestDeviceList{})
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +95,7 @@ func (c *Client) Devices() ([]device.Device, error) {
 }
 
 func (c *Client) Ping() error {
-	_, err := c.sendRecv(&message.Ping{})
+	_, err := c.connector.SendRecv(&message.Ping{})
 	if err != nil {
 		return err
 	}
@@ -106,20 +104,4 @@ func (c *Client) Ping() error {
 
 func (c Client) ServerName() string {
 	return c.serverName
-}
-
-func (c *Client) sendRecv(m message.Message) (message.Message, error) {
-	id := c.idCounter
-	c.idCounter++
-	m.SetID(id)
-	err := c.connector.Send(m)
-	if err != nil {
-		return nil, err
-	}
-	recv := <-c.msg_recv[id]
-	if err, ok := recv.(*message.Error); ok {
-		return err, err.Error()
-	}
-	delete(c.msg_recv, id)
-	return recv, nil
 }

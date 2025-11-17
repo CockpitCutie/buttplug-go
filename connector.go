@@ -13,6 +13,7 @@ type Connector interface {
 	Connected() bool
 	Disconnect() error
 	Send(msg message.Message) error
+	SendRecv(msg message.Message) (message.Message, error)
 }
 
 type WebsocketConnector struct {
@@ -20,6 +21,7 @@ type WebsocketConnector struct {
 	isOpen  bool
 	conn    *websocket.Conn
 	msgRecv map[uint32]chan message.Message
+	idCounter uint32
 }
 
 func NewWsConnector(url string) *WebsocketConnector {
@@ -28,6 +30,7 @@ func NewWsConnector(url string) *WebsocketConnector {
 		isOpen:  false,
 		conn:    nil,
 		msgRecv: nil,
+		idCounter: 1,
 	}
 }
 
@@ -85,4 +88,20 @@ func (w *WebsocketConnector) Send(msg message.Message) error {
 		return err
 	}
 	return w.conn.WriteMessage(websocket.TextMessage, []byte(serialized))
+}
+
+func (w *WebsocketConnector) SendRecv(m message.Message) (message.Message, error) {
+	id := w.idCounter
+	w.idCounter++
+	m.SetID(id)
+	err := w.Send(m)
+	if err != nil {
+		return nil, err
+	}
+	recv := <-w.msgRecv[id]
+	if err, ok := recv.(*message.Error); ok {
+		return err, err.Error()
+	}
+	delete(w.msgRecv, id)
+	return recv, nil
 }
