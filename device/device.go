@@ -1,6 +1,10 @@
 package device
 
-import "github.com/CockpitCutie/buttplug-go/message"
+import (
+	"fmt"
+
+	"github.com/CockpitCutie/buttplug-go/message"
+)
 
 type Device struct {
 	Name             string
@@ -9,14 +13,16 @@ type Device struct {
 	DisplayName      *string
 	actuators        []Actuator
 	sensors          []Sensor
+	messageSender    MessageSender
 }
 
-func FromMessage(msg message.Device) Device {
+func FromMessage(msg message.Device, sender MessageSender) Device {
 	device := Device{
 		Name:             msg.DeviceName,
 		Index:            msg.DeviceIndex,
 		MessageTimingGap: msg.DeviceMessageTimingGap,
 		DisplayName:      msg.DeviceDisplayName,
+		messageSender:    sender,
 	}
 	for cmdLabel, attrs := range msg.DeviceMessages {
 		cmd := Command(cmdLabel)
@@ -64,12 +70,22 @@ func (d *Device) Sensors() []Sensor {
 }
 
 func (d *Device) Vibrate(intensity float64) error {
+	var scalars []message.Scalar
 	for _, actuator := range d.actuators {
 		if actuator.Type == VibrateActuator {
-			
+			scalars = append(scalars, message.Scalar{
+				Index:        actuator.Index,
+				Scalar:       intensity,
+				ActuatorType: string(VibrateActuator),
+			})
 		}
 	}
-	return nil
+	fmt.Printf("%+v", scalars)
+	_, err := d.messageSender.SendRecv(&message.ScalarCmd{
+		DeviceIndex: d.Index,
+		Scalars:     scalars,
+	})
+	return err
 }
 
 func (d *Device) Rotate(intensity float64) error {
@@ -104,5 +120,5 @@ const (
 )
 
 type MessageSender interface {
-	
+	SendRecv(message.Message) (message.Message, error)
 }

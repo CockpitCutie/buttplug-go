@@ -17,19 +17,19 @@ type Connector interface {
 }
 
 type WebsocketConnector struct {
-	url     string
-	isOpen  bool
-	conn    *websocket.Conn
-	msgRecv map[uint32]chan message.Message
+	url       string
+	isOpen    bool
+	conn      *websocket.Conn
+	msgRecv   map[uint32]chan message.Message
 	idCounter uint32
 }
 
 func NewWsConnector(url string) *WebsocketConnector {
 	return &WebsocketConnector{
-		url:     url,
-		isOpen:  false,
-		conn:    nil,
-		msgRecv: nil,
+		url:       url,
+		isOpen:    false,
+		conn:      nil,
+		msgRecv:   nil,
 		idCounter: 1,
 	}
 }
@@ -63,8 +63,10 @@ func (w *WebsocketConnector) listenLoop() {
 		}
 		deserialized, err := message.Deserialize(buf)
 		if err != nil {
+			println(err.Error())
 			continue
 		}
+		println("deserialized")
 		if _, ok := w.msgRecv[deserialized.ID()]; !ok {
 			w.msgRecv[deserialized.ID()] = make(chan message.Message)
 		}

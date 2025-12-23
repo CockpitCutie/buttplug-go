@@ -2,13 +2,13 @@ package message
 
 type RequestServerInfo struct {
 	message
-	ClientName string
+	ClientName     string
 	MessageVersion uint
 }
 
 type ServerInfo struct {
 	message
-	ServerName string
+	ServerName     string
 	MessageVersion uint
-	MaxPingTime uint
+	MaxPingTime    uint
 }

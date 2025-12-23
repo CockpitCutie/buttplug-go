@@ -12,23 +12,23 @@ type StopAllDevices struct {
 type ScalarCmd struct {
 	message
 	DeviceIndex uint
-	Scalars []Scalar
+	Scalars     []Scalar
 }
 
 type Scalar struct {
-	Index uint
-	Scalar float64
+	Index        uint
+	Scalar       float64
 	ActuatorType string
 }
 
 type LinearCmd struct {
 	message
 	DeviceIndex uint
-	Vectors []Vector
+	Vectors     []Vector
 }
 
 type Vector struct {
-	Index uint
+	Index    uint
 	Duration uint
 	Position float64
 }
@@ -36,11 +36,11 @@ type Vector struct {
 type RotateCmd struct {
 	message
 	DeviceIndex uint
-	Rotations []Rotation
+	Rotations   []Rotation
 }
 
 type Rotation struct {
-	Index uint
-	Speed float64
+	Index     uint
+	Speed     float64
 	Clockwise bool
 }

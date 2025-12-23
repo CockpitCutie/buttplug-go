@@ -22,29 +22,29 @@ type DeviceList struct {
 }
 
 type Device struct {
-	DeviceName string
-	DeviceIndex uint
+	DeviceName             string
+	DeviceIndex            uint
 	DeviceMessageTimingGap *uint
-	DeviceDisplayName *string
-	DeviceMessages map[string][]Attributes
+	DeviceDisplayName      *string
+	DeviceMessages         map[string][]Attributes
 }
 
 type Attributes struct {
 	FeatureDescriptor *string
-	StepCount *uint
-	ActuatorType *string
-	SensorType *string
-	SensorRange [][2]int
-	EndPoints []string
+	StepCount         *uint
+	ActuatorType      *string
+	SensorType        *string
+	SensorRange       [][2]int
+	EndPoints         []string
 }
 
 type DeviceAdded struct {
 	message
-	DeviceName string
-	DeviceIndex uint
+	DeviceName             string
+	DeviceIndex            uint
 	DeviceMessageTimingGap *uint
-	DeviceDisplayName *string
-	DeviceMessages map[string]Attributes
+	DeviceDisplayName      *string
+	DeviceMessages         map[string]Attributes
 }
 
 type DeviceRemoved struct {

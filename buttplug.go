@@ -82,12 +82,14 @@ func (c *Client) StopAllDevices() error {
 func (c *Client) Devices() ([]device.Device, error) {
 	devicelist, err := c.connector.SendRecv(&message.RequestDeviceList{})
 	if err != nil {
+		println("fuck")
 		return nil, err
 	}
+
 	if devicelist, ok := devicelist.(*message.DeviceList); ok {
 		var devices []device.Device
 		for _, d := range devicelist.Devices {
-			devices = append(devices, device.FromMessage(d))
+			devices = append(devices, device.FromMessage(d, c.connector))
 		}
 		return devices, nil
 	}
