@@ -79,6 +79,9 @@ func (w *WebsocketConnector) Connected() bool {
 }
 
 func (w *WebsocketConnector) Disconnect() error {
+	if w.conn == nil {
+		return nil
+	}
 	return w.conn.Close()
 }
 
