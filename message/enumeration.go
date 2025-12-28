@@ -1,5 +1,9 @@
 package message
 
+import (
+	"encoding/json"
+)
+
 type StartScanning struct {
 	message
 }
@@ -26,7 +30,18 @@ type Device struct {
 	DeviceIndex            uint
 	DeviceMessageTimingGap *uint
 	DeviceDisplayName      *string
-	DeviceMessages         map[string][]Attributes
+	DeviceMessages         map[string]DeviceAttrs
+}
+
+type DeviceAttrs struct {
+	Attrs []Attributes
+}
+
+func (d *DeviceAttrs) UnmarshalJSON(b []byte) error {
+	if string(b) == "{}" {
+		return nil
+	}
+	return json.Unmarshal(b, &d.Attrs)
 }
 
 type Attributes struct {
@@ -44,7 +59,7 @@ type DeviceAdded struct {
 	DeviceIndex            uint
 	DeviceMessageTimingGap *uint
 	DeviceDisplayName      *string
-	DeviceMessages         map[string]Attributes
+	DeviceMessages         map[string][]Attributes
 }
 
 type DeviceRemoved struct {

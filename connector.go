@@ -54,10 +54,9 @@ func (w *WebsocketConnector) listenLoop() {
 	for {
 		kind, buf, err := w.conn.ReadMessage()
 		if err != nil {
-			println("failed to read")
+			println(err.Error())
 			break
 		}
-		fmt.Printf("recv: `%s`\n", buf)
 		if kind != websocket.TextMessage {
 			continue
 		}
@@ -66,7 +65,6 @@ func (w *WebsocketConnector) listenLoop() {
 			println(err.Error())
 			continue
 		}
-		println("deserialized")
 		if _, ok := w.msgRecv[deserialized.ID()]; !ok {
 			w.msgRecv[deserialized.ID()] = make(chan message.Message)
 		}
@@ -86,6 +84,9 @@ func (w *WebsocketConnector) Disconnect() error {
 }
 
 func (w *WebsocketConnector) Send(msg message.Message) error {
+	if w.conn == nil {
+		return fmt.Errorf("not connected")
+	}
 	w.msgRecv[msg.ID()] = make(chan message.Message)
 	serialized, err := message.Serialize(msg)
 	fmt.Printf("sending: `%s`\n", serialized)

@@ -84,7 +84,6 @@ func Deserialize(b []byte) (Message, error) {
 			return &reqDevList, err
 		case "DeviceList":
 			var devList DeviceList
-
 			err = json.Unmarshal(value, &devList)
 			return &devList, err
 		case "StopAllDevices":
