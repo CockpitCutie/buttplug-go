@@ -1,11 +1,12 @@
 package device
 
 type Sensor struct {
-	Index      uint
-	Descriptor string
-	Type       SensorType
-	Range      [][2]int
-	Command    Command
+	Index         uint
+	Descriptor    string
+	Type          SensorType
+	Range         [][2]int
+	Command       Command
+	messageSender MessageSender
 }
 
 type SensorType string

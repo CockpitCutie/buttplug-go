@@ -1,8 +1,6 @@
 package device
 
 import (
-	"fmt"
-
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
@@ -29,9 +27,9 @@ func FromMessage(msg message.Device, sender MessageSender) Device {
 		isActuator := cmd == ScalarCmd || cmd == LinearCmd || cmd == RotateCmd
 		isSensor := cmd == SensorReadCmd || cmd == SensorSubscribeCmd
 		if isActuator {
-			device.addActuators(cmd, attrs)
+			device.addActuators(cmd, attrs.Attrs)
 		} else if isSensor {
-			device.addSensors(cmd, attrs)
+			device.addSensors(cmd, attrs.Attrs)
 		}
 	}
 	return device
@@ -40,11 +38,13 @@ func FromMessage(msg message.Device, sender MessageSender) Device {
 func (d *Device) addActuators(cmd Command, attrs []message.Attributes) {
 	for i, attrs := range attrs {
 		d.actuators = append(d.actuators, Actuator{
-			Index:      uint(i),
-			Descriptor: *attrs.FeatureDescriptor,
-			Type:       ActuatorType(*attrs.ActuatorType),
-			StepCount:  *attrs.StepCount,
-			Command:    cmd,
+			Index:         uint(i),
+			Descriptor:    *attrs.FeatureDescriptor,
+			Type:          ActuatorType(*attrs.ActuatorType),
+			StepCount:     *attrs.StepCount,
+			Command:       cmd,
+			DeviceIndex:   d.Index,
+			messageSender: d.messageSender,
 		})
 	}
 }
@@ -52,11 +52,12 @@ func (d *Device) addActuators(cmd Command, attrs []message.Attributes) {
 func (d *Device) addSensors(cmd Command, attrs []message.Attributes) {
 	for i, attrs := range attrs {
 		d.sensors = append(d.sensors, Sensor{
-			Index:      uint(i),
-			Descriptor: *attrs.FeatureDescriptor,
-			Type:       SensorType(*attrs.SensorType),
-			Range:      attrs.SensorRange,
-			Command:    cmd,
+			Index:         uint(i),
+			Descriptor:    *attrs.FeatureDescriptor,
+			Type:          SensorType(*attrs.SensorType),
+			Range:         attrs.SensorRange,
+			Command:       cmd,
+			messageSender: d.messageSender,
 		})
 	}
 }
@@ -73,14 +74,9 @@ func (d *Device) Vibrate(intensity float64) error {
 	var scalars []message.Scalar
 	for _, actuator := range d.actuators {
 		if actuator.Type == VibrateActuator {
-			scalars = append(scalars, message.Scalar{
-				Index:        actuator.Index,
-				Scalar:       intensity,
-				ActuatorType: string(VibrateActuator),
-			})
+			actuator.Vibrate(intensity)
 		}
 	}
-	fmt.Printf("%+v", scalars)
 	_, err := d.messageSender.SendRecv(&message.ScalarCmd{
 		DeviceIndex: d.Index,
 		Scalars:     scalars,
