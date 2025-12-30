@@ -38,6 +38,7 @@ func Serialize(m Message) (string, error) {
 }
 
 func Deserialize(b []byte) (Message, error) {
+	println(string(b))
 	msgs := []map[string]json.RawMessage{}
 	err := json.Unmarshal(b, &msgs)
 	if err != nil || len(msgs) == 0 {

@@ -46,30 +46,36 @@ func (w *WebsocketConnector) Connect(msgRecv map[uint32]chan message.Message) er
 		w.isOpen = false
 		return w.conn.WriteMessage(websocket.CloseMessage, []byte{})
 	})
-	go w.listenLoop()
+	go w.readFromServer()
 	return nil
 }
 
-func (w *WebsocketConnector) listenLoop() {
+func (w *WebsocketConnector) readFromServer() {
 	for {
+		if !w.isOpen {
+			break
+		}
 		kind, buf, err := w.conn.ReadMessage()
 		if err != nil {
-			println(err.Error())
-			break
+			w.isOpen = false
 		}
 		if kind != websocket.TextMessage {
 			continue
 		}
-		deserialized, err := message.Deserialize(buf)
+		msg, err := message.Deserialize(buf)
 		if err != nil {
-			println(err.Error())
 			continue
 		}
-		if _, ok := w.msgRecv[deserialized.ID()]; !ok {
-			w.msgRecv[deserialized.ID()] = make(chan message.Message)
-		}
-		w.msgRecv[deserialized.ID()] <- deserialized
+		go w.sortMessage(msg)
 	}
+}
+
+func (w *WebsocketConnector) sortMessage(msg message.Message) {
+	id := msg.ID()
+	if _, ok := w.msgRecv[id]; !ok {
+		w.msgRecv[id] = make(chan message.Message)
+	}
+	w.msgRecv[id] <- msg
 }
 
 func (w *WebsocketConnector) Connected() bool {
@@ -89,7 +95,7 @@ func (w *WebsocketConnector) Send(msg message.Message) error {
 	}
 	w.msgRecv[msg.ID()] = make(chan message.Message)
 	serialized, err := message.Serialize(msg)
-	fmt.Printf("sending: `%s`\n", serialized)
+	println(serialized)
 	if err != nil {
 		return err
 	}
@@ -97,17 +103,25 @@ func (w *WebsocketConnector) Send(msg message.Message) error {
 }
 
 func (w *WebsocketConnector) SendRecv(m message.Message) (message.Message, error) {
-	id := w.idCounter
-	w.idCounter++
-	m.SetID(id)
+	m.SetID(w.nextID())
 	err := w.Send(m)
 	if err != nil {
 		return nil, err
 	}
-	recv := <-w.msgRecv[id]
-	if err, ok := recv.(*message.Error); ok {
+	return w.recv(m.ID())
+}
+
+func (w *WebsocketConnector) recv(id uint32) (message.Message, error) {
+	msg := <-w.msgRecv[id]
+	if err, ok := msg.(*message.Error); ok {
 		return err, err.Error()
 	}
 	delete(w.msgRecv, id)
-	return recv, nil
+	return msg, nil
+}
+
+func (w *WebsocketConnector) nextID() uint32 {
+	id := w.idCounter
+	w.idCounter++
+	return id
 }
