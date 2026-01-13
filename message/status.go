@@ -8,8 +8,8 @@ type Ok struct {
 
 type Error struct {
 	message
-	Message string
-	Code    ErrorCode
+	Message string    `json:"ErrorMessage"`
+	Code    ErrorCode `json:"ErrorCode"`
 }
 
 func (e Error) Error() error {
