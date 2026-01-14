@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOk(t *testing.T) {
+func TestDeserializeOk(t *testing.T) {
 	jsonMessage := `[
   {
     "Ok": {
@@ -24,7 +24,7 @@ func TestOk(t *testing.T) {
 
 }
 
-func TestError(t *testing.T) {
+func TestDeserializeError(t *testing.T) {
 	jsonMessage := `[
   {
     "Error": {
@@ -45,7 +45,7 @@ func TestError(t *testing.T) {
 	}
 }
 
-func TestPing(t *testing.T) {
+func TestDeserializePing(t *testing.T) {
 	jsonMessage := `[
   {
     "Ping": {
@@ -62,7 +62,7 @@ func TestPing(t *testing.T) {
 	}
 }
 
-func TestRequestServerInfo(t *testing.T) {
+func TestDeserializeRequestServerInfo(t *testing.T) {
 	jsonMessage := `[
   {
     "RequestServerInfo": {
@@ -106,7 +106,7 @@ func TestServerInfo(t *testing.T) {
 	}
 }
 
-func TestStartScanning(t *testing.T) {
+func TestDeserializeStartScanning(t *testing.T) {
 	jsonMessage := `[
   {
     "StartScanning": {
@@ -123,7 +123,7 @@ func TestStartScanning(t *testing.T) {
 	}
 }
 
-func TestStopScanning(t *testing.T) {
+func TestDeserializeStopScanning(t *testing.T) {
 	jsonMessage := `[
   {
     "StopScanning": {
@@ -140,7 +140,7 @@ func TestStopScanning(t *testing.T) {
 	}
 }
 
-func TestScanningFinished(t *testing.T) {
+func TestDeserializeScanningFinished(t *testing.T) {
 	jsonMessage := `[
   {
     "ScanningFinished": {
@@ -157,7 +157,7 @@ func TestScanningFinished(t *testing.T) {
 	}
 }
 
-func TestRequestDeviceList(t *testing.T) {
+func TestDeserializeRequestDeviceList(t *testing.T) {
 	jsonMessage := `[
   {
     "RequestDeviceList": {
@@ -174,7 +174,7 @@ func TestRequestDeviceList(t *testing.T) {
 	}
 }
 
-func TestDeviceList(t *testing.T) {
+func TestDeserializeDeviceList(t *testing.T) {
 	jsonMessage := `[
   {
     "DeviceList": {
@@ -227,7 +227,7 @@ func TestDeviceList(t *testing.T) {
 	}
 }
 
-func TestDeviceAdded(t *testing.T) {
+func TestDeserializeDeviceAdded(t *testing.T) {
 	jsonMessage := `[
   {
     "DeviceAdded": {
@@ -267,7 +267,7 @@ func TestDeviceAdded(t *testing.T) {
 	}
 }
 
-func TestDeviceRemoved(t *testing.T) {
+func TestDeserializeDeviceRemoved(t *testing.T) {
 	jsonMessage := `[
   {
     "DeviceRemoved": {
