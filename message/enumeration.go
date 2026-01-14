@@ -59,7 +59,7 @@ type DeviceAdded struct {
 	DeviceIndex            uint
 	DeviceMessageTimingGap *uint
 	DeviceDisplayName      *string
-	DeviceMessages         map[string][]Attributes
+	DeviceMessages         map[string]DeviceAttrs
 }
 
 type DeviceRemoved struct {
