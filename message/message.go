@@ -29,6 +29,7 @@ func (m message) IsServerEvent() bool {
 }
 
 func Serialize(m Message) (string, error) {
+	// get name of specific message type for json key
 	messageKind := reflect.TypeOf(m).Elem().Name()
 	serialized, err := json.Marshal(m)
 	if err != nil {
@@ -79,7 +80,7 @@ func Deserialize(b []byte) (Message, error) {
 			var scanFinished ScanningFinished
 			err = json.Unmarshal(value, &scanFinished)
 			return &scanFinished, err
-		case "RequestDevicelist":
+		case "RequestDeviceList":
 			var reqDevList RequestDeviceList
 			err = json.Unmarshal(value, &reqDevList)
 			return &reqDevList, err
