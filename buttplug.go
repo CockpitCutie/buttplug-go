@@ -51,7 +51,7 @@ func (c *Client) onConnect() error {
 
 // Check if the client is connected to a Buttplug server
 func (c Client) Connected() bool {
-	return c.connector != nil && c.Connected()
+	return c.connector != nil && c.connector.Connected()
 }
 
 // Disconnect from the Buttplug server
