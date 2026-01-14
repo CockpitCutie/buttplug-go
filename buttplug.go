@@ -15,6 +15,7 @@ type Client struct {
 	serverName string
 }
 
+// Create a new Buttplugio client with a given name
 func New(name string) *Client {
 	return &Client{
 		name:       name,
@@ -24,6 +25,7 @@ func New(name string) *Client {
 	}
 }
 
+// Connect to a Buttplug server using the provided Connector
 func (c *Client) Connect(connector Connector) error {
 	c.connector = connector
 	err := connector.Connect(c.msg_recv)
@@ -47,14 +49,17 @@ func (c *Client) onConnect() error {
 	return nil
 }
 
+// Check if the client is connected to a Buttplug server
 func (c Client) Connected() bool {
 	return c.connector != nil && c.Connected()
 }
 
+// Disconnect from the Buttplug server
 func (c *Client) Disconnect() error {
 	return c.connector.Disconnect()
 }
 
+// Start scanning for devices
 func (c *Client) StartScanning() error {
 	_, err := c.connector.SendRecv(&message.StartScanning{})
 	if err != nil {
@@ -63,6 +68,7 @@ func (c *Client) StartScanning() error {
 	return nil
 }
 
+// Stop scanning for devices
 func (c *Client) StopScanning() error {
 	_, err := c.connector.SendRecv(&message.StopScanning{})
 	if err != nil {
@@ -71,6 +77,7 @@ func (c *Client) StopScanning() error {
 	return nil
 }
 
+// Stop all connected devices
 func (c *Client) StopAllDevices() error {
 	_, err := c.connector.SendRecv(&message.StopAllDevices{})
 	if err != nil {
@@ -79,6 +86,7 @@ func (c *Client) StopAllDevices() error {
 	return nil
 }
 
+// Retrieve the list of connected devices from the Buttplug server
 func (c *Client) Devices() ([]device.Device, error) {
 	devicelist, err := c.connector.SendRecv(&message.RequestDeviceList{})
 	if err != nil {
@@ -96,6 +104,7 @@ func (c *Client) Devices() ([]device.Device, error) {
 	return nil, fmt.Errorf("expected DeviceList, found %T", devicelist)
 }
 
+// Ping the Buttplug server to maintain a keep-alive, or check connectivity
 func (c *Client) Ping() error {
 	_, err := c.connector.SendRecv(&message.Ping{})
 	if err != nil {
@@ -104,6 +113,7 @@ func (c *Client) Ping() error {
 	return nil
 }
 
+// Get the server name of the connected Buttplug server
 func (c Client) ServerName() string {
 	return c.serverName
 }
