@@ -8,9 +8,9 @@ type DeviceList struct {
 type Device struct {
 	DeviceName             string
 	DeviceIndex            uint
-	DeviceMessageTimingGap *uint
-	DeviceDisplayName      *string
-	Features         map[string]DeviceFeatures
+	DeviceMessageTimingGap uint   `json:",omitempty"`
+	DeviceDisplayName      string `json:",omitempty"`
+	Features               map[string]DeviceFeatures
 }
 
 type DeviceFeatures struct {

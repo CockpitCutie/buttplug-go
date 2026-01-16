@@ -274,8 +274,8 @@ func TestDeserializeDeviceList(t *testing.T) {
 		if dev0, ok := msg.Devices["0"]; assert.True(t, ok) {
 			assert.Equal(t, uint(0), dev0.DeviceIndex)
 			assert.Equal(t, "Test Vibrator", dev0.DeviceName)
-			assert.Nil(t, dev0.DeviceDisplayName)
-			assert.Nil(t, dev0.DeviceMessageTimingGap)
+			assert.Equal(t, "", dev0.DeviceDisplayName)
+			assert.Equal(t, uint(0), dev0.DeviceMessageTimingGap)
 			if feat, ok := dev0.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
@@ -300,8 +300,8 @@ func TestDeserializeDeviceList(t *testing.T) {
 		if dev1, ok := msg.Devices["1"]; assert.True(t, ok) {
 			assert.Equal(t, uint(1), dev1.DeviceIndex)
 			assert.Equal(t, "Test Stroker", dev1.DeviceName)
-			assert.Equal(t, "User set name", *dev1.DeviceDisplayName)
-			assert.Equal(t, uint(100), *dev1.DeviceMessageTimingGap)
+			assert.Equal(t, "User set name", dev1.DeviceDisplayName)
+			assert.Equal(t, uint(100), dev1.DeviceMessageTimingGap)
 			if feat, ok := dev1.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Stroker", feat.FeatureDescription)
