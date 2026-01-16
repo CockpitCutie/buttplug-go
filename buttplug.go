@@ -7,6 +7,11 @@ import (
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
+const (
+	ProtoVersionMajor = 4
+	ProtoVersionMinor = 0
+)
+
 // Client represents a Buttplugio client that can connect to a Buttplug server.
 type Client struct {
 	name       string
@@ -38,7 +43,8 @@ func (c *Client) Connect(connector Connector) error {
 func (c *Client) onConnect() error {
 	recv, err := c.connector.SendRecv(&message.RequestServerInfo{
 		ClientName:     c.name,
-		MessageVersion: 3,
+		ProtocolVersionMajor: ProtoVersionMajor,
+		ProtocolVersionMinor: ProtoVersionMinor,
 	})
 	if err != nil {
 		return err

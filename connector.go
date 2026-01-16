@@ -62,11 +62,13 @@ func (w *WebsocketConnector) readFromServer() {
 		if kind != websocket.TextMessage {
 			continue
 		}
-		msg, err := message.Deserialize(buf)
+		msgs, err := message.Deserialize(buf)
 		if err != nil {
 			continue
 		}
-		go w.sortMessage(msg)
+		for _, msg := range msgs {
+			go w.sortMessage(msg)
+		}
 	}
 }
 
