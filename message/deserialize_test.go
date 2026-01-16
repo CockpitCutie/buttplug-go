@@ -279,22 +279,22 @@ func TestDeserializeDeviceList(t *testing.T) {
 			if feat, ok := dev0.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
-				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["1"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(1), feat.FeatureIndex)
 				assert.Equal(t, "Insertable Stimulator", feat.FeatureDescription)
-				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Rotating Head with Directional Control", feat.FeatureDescription)
-				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{-20, 20}}}, feat.Output)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{-20, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["3"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(3), feat.FeatureIndex)
 				assert.Equal(t, "Battery", feat.FeatureDescription)
-				assert.Equal(t, DeviceInput{"Battery": {Value: &[2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
+				assert.Equal(t, map[string]DeviceInput{"Battery": {Value: &[2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
 			}
 		}
 		if dev1, ok := msg.Devices["1"]; assert.True(t, ok) {
@@ -305,14 +305,14 @@ func TestDeserializeDeviceList(t *testing.T) {
 			if feat, ok := dev1.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Stroker", feat.FeatureDescription)
-				assert.Equal(t, DeviceOutput{
+				assert.Equal(t, map[string]DeviceOutput{
 					"PositionWithDuration": {Position: &[2]uint{0, 100}, Duration: &[2]uint{0, 100000}},
 					"Position":             {Position: &[2]uint{0, 100}}}, feat.Output)
 			}
 			if feat, ok := dev1.Features["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Bluetooth Radio RSSI", feat.FeatureDescription)
-				assert.Equal(t, DeviceInput{"RSSI": {Value: &[2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
+				assert.Equal(t, map[string]DeviceInput{"RSSI": {Value: &[2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
 			}
 		}
 	} else {
