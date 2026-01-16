@@ -280,22 +280,22 @@ func TestDeserializeDeviceList(t *testing.T) {
 			if feat, ok := dev0.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["1"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(1), feat.FeatureIndex)
 				assert.Equal(t, "Insertable Stimulator", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Rotating Head with Directional Control", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{-20, 20}}}, feat.Output)
+				assert.Equal(t, DeviceOutput{"Vibrate": {Value: &[2]int{-20, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.Features["3"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(3), feat.FeatureIndex)
 				assert.Equal(t, "Battery", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceInput{"Battery": {Value: &[2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
+				assert.Equal(t, DeviceInput{"Battery": {Value: &[2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
 			}
 		}
 		if dev1, ok := msg.Devices["1"]; assert.True(t, ok) {
@@ -306,17 +306,140 @@ func TestDeserializeDeviceList(t *testing.T) {
 			if feat, ok := dev1.Features["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Stroker", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceOutput{
+				assert.Equal(t, DeviceOutput{
 					"PositionWithDuration": {Position: &[2]uint{0, 100}, Duration: &[2]uint{0, 100000}},
 					"Position":             {Position: &[2]uint{0, 100}}}, feat.Output)
 			}
 			if feat, ok := dev1.Features["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Bluetooth Radio RSSI", feat.FeatureDescription)
-				assert.Equal(t, map[string]DeviceInput{"RSSI": {Value: &[2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
+				assert.Equal(t, DeviceInput{"RSSI": {Value: &[2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
 			}
 		}
 	} else {
 		t.Errorf("Deserialized message is not of type DeviceList")
+	}
+}
+
+func TestDeserializeStopDeviceCmd(t *testing.T) {
+	jsonMessage := `[
+  {
+    "StopDeviceCmd": {
+      "Id": 1,
+      "DeviceIndex": 0,
+      "Inputs": true,
+      "Outputs": true
+    }
+  }
+]`
+	msg, err := Deserialize([]byte(jsonMessage))
+	assert.NoErrorf(t, err, "Error deserializing message")
+	if msg, ok := msg.(*StopDeviceCmd); ok {
+		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equal(t, uint(0), msg.DeviceIndex)
+		assert.Equal(t, true, *msg.Inputs)
+		assert.Equal(t, true, *msg.Outputs)
+	} else {
+		t.Errorf("Deserialized message is not of type StopDeviceCmd")
+	}
+}
+
+func TestDeserializeStopAllDevices(t *testing.T) {
+	jsonMessage := `[
+  {
+    "StopAllDevices": {
+      "Id": 1,
+      "Inputs": true,
+      "Outputs": true
+    }
+  }
+]`
+	msg, err := Deserialize([]byte(jsonMessage))
+	assert.NoErrorf(t, err, "Error deserializing message")
+	if msg, ok := msg.(*StopAllDevices); ok {
+		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equal(t, true, *msg.Inputs)
+		assert.Equal(t, true, *msg.Outputs)
+	} else {
+		t.Errorf("Deserialized message is not of type StopAllDevices")
+	}
+}
+
+func TestDeserializeOutputCmdVibrate(t *testing.T) {
+	jsonMessage := `  [{
+    "OutputCmd": {
+      "Id": 1,
+      "DeviceIndex": 0,
+      "FeatureIndex": 0,
+      "Command": {
+        "Vibrate": {
+          "Value": 10
+        }
+      }
+    }
+  }]`
+	msg, err := Deserialize([]byte(jsonMessage))
+	assert.NoError(t, err)
+	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+		assert.Equal(t, uint32(1), msg.Id)
+		assert.Equal(t, uint(0), msg.DeviceIndex)
+		assert.Equal(t, uint(0), msg.FeatureIndex)
+		assert.Equal(t, uint32(10), msg.Command["Vibrate"].Value)
+	} else {
+		t.Errorf("Deserialized message is not of type OutputCmd")
+	}
+}
+
+func TestDeserializeOutputCmdRotationWithDirection(t *testing.T) {
+	jsonMessage := `  [{
+    "OutputCmd": {
+      "Id": 1,
+      "DeviceIndex": 0,
+      "FeatureIndex": 0,
+      "Command": {
+        "RotateWithDirection": {
+          "Value": 10,
+          "Clockwise": false
+        }
+      }
+    }
+  }]`
+	msg, err := Deserialize([]byte(jsonMessage))
+	assert.NoError(t, err)
+	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+		assert.Equal(t, uint32(1), msg.Id)
+		assert.Equal(t, uint(0), msg.DeviceIndex)
+		assert.Equal(t, uint(0), msg.FeatureIndex)
+		assert.Equal(t, uint32(10), msg.Command["RotateWithDirection"].Value)
+		assert.False(t, *msg.Command["RotateWithDirection"].Clockwise)
+	} else {
+		t.Errorf("Deserialized message is not of type OutputCmd")
+	}
+}
+
+func TestDeserializeOutputCmdPositionWithDuration(t *testing.T) {
+	jsonMessage := `  [{
+    "OutputCmd": {
+      "Id": 1,
+      "DeviceIndex": 0,
+      "FeatureIndex": 0,
+      "Command": {
+        "PositionWithDuration": {
+          "Value": 85,
+          "Duration": 15
+        }
+      }
+    }
+  }]`
+	msg, err := Deserialize([]byte(jsonMessage))
+	assert.NoError(t, err)
+	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+		assert.Equal(t, uint32(1), msg.Id)
+		assert.Equal(t, uint(0), msg.DeviceIndex)
+		assert.Equal(t, uint(0), msg.FeatureIndex)
+		assert.Equal(t, uint32(85), msg.Command["PositionWithDuration"].Value)
+		assert.Equal(t, uint32(15), *msg.Command["PositionWithDuration"].Duration)
+	} else {
+		t.Errorf("Deserialized message is not of type OutputCmd")
 	}
 }
