@@ -23,12 +23,12 @@ type DeviceFeature struct {
 }
 
 type DeviceOutput struct {
-	Value    *[2]int
-	Position *[2]uint
-	Duration *[2]uint
+	Value    []int
+	Position []uint
+	Duration []uint
 }
 
 type DeviceInput struct {
-	Value   *[2]int
+	Value   []int
 	Command []string
 }

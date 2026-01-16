@@ -1,6 +1,7 @@
 package device
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/CockpitCutie/buttplug-go/message"
@@ -25,41 +26,95 @@ const (
 	PositionWithDirectionOutput OutputType = "PositionWithDirection"
 )
 
-func outputsFromFeatures(features message.DeviceFeatures, sender MessageSender) ([]Output, error) {
-	var outputs []Output
+func (d *Device) registerOutputs(features message.DeviceFeatures) error {
 	for _, featureMsg := range features {
 		feature := feature{
 			description: featureMsg.FeatureDescription,
 			index:       featureMsg.FeatureIndex,
-			sender:      sender,
+			sender:      d.msgSender,
 		}
 		_ = feature
 		if featureMsg.Input == nil {
 			continue
 		}
-		for kind, properties := range featureMsg.Input {
-			_, _ = kind, properties
+		for kind, properties := range featureMsg.Output {
+			output, err := outputFromProps(OutputType(kind), properties, feature)
+			if err != nil {
+				return err
+			}
+			d.Outputs = append(d.Outputs, output)
 		}
-		outputs = append(outputs, nil)
 	}
-	return outputs, nil
+	return nil
+}
+
+func outputFromProps(kind OutputType, properties message.DeviceOutput, feature feature) (Output, error) {
+	switch kind {
+	case VibrateOutput:
+		return Vibrator{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case RotateOutput:
+		return Rotator{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case RotationWithDirectionOutput:
+		return RotatorWithDirection{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case OscillateOutput:
+		return Oscillator{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case ConstrictOutput:
+		return Constrictor{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case HeaterOutput:
+		return Heater{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case LEDOutput:
+		return LED{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case PositionOutput:
+		return Position{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	case PositionWithDirectionOutput:
+		return PositionWithDuration{
+			feature: feature,
+			stepCount: uint32(properties.Value[1]),
+		}, nil
+	default:
+		return nil, fmt.Errorf("unknown device type %s", kind)
+	}
 }
 
 type Vibrator struct {
 	feature
-	stepCount uint32
+	stepRange []int32
 }
 
 func (v Vibrator) OutputType() OutputType {
 	return VibrateOutput
 }
 
-func (v Vibrator) Activate(step uint32) error {
+func (v Vibrator) Activate(speedStep uint32) error {
 	return nil
 }
 
-func (v Vibrator) Vibrate(step uint32) error {
-	return v.Activate(step)
+func (v Vibrator) Vibrate(speedStep uint32) error {
+	return v.Activate(speedStep)
 }
 
 type Rotator struct {
@@ -71,12 +126,12 @@ func (r Rotator) OutputType() OutputType {
 	return RotateOutput
 }
 
-func (r Rotator) Activate(step uint32) error {
+func (r Rotator) Activate(speedStep uint32) error {
 	return nil
 }
 
-func (r Rotator) Rotate(step uint32) error {
-	return r.Rotate(step)
+func (r Rotator) Rotate(speedStep uint32) error {
+	return r.Rotate(speedStep)
 }
 
 type RotatorWithDirection struct {
@@ -88,11 +143,11 @@ func (r RotatorWithDirection) OutputType() OutputType {
 	return RotationWithDirectionOutput
 }
 
-func (r RotatorWithDirection) Activate(step uint32, clockwise bool) error {
+func (r RotatorWithDirection) Activate(speedStep uint32, clockwise bool) error {
 	return nil
 }
-func (r RotatorWithDirection) RotateDirection(step uint32, clockwise bool) error {
-	return r.Activate(step, clockwise)
+func (r RotatorWithDirection) RotateDirection(speedStep uint32, clockwise bool) error {
+	return r.Activate(speedStep, clockwise)
 }
 
 type Oscillator struct {
@@ -104,7 +159,7 @@ func (o Oscillator) OutputType() OutputType {
 	return OscillateOutput
 }
 
-func (o Oscillator) Activate(step uint32) error {
+func (o Oscillator) Activate(speedStep uint32) error {
 	return nil
 }
 
@@ -130,7 +185,7 @@ func (h Heater) OutputType() OutputType {
 	return HeaterOutput
 }
 
-func (h Heater) Activate(step uint32) error {
+func (h Heater) Activate(heatLevel uint32) error {
 	return nil
 }
 
@@ -143,7 +198,7 @@ func (l LED) OutputType() OutputType {
 	return LEDOutput
 }
 
-func (l LED) Activate(step uint32) error {
+func (l LED) Activate(brightnessStep uint32) error {
 	return nil
 }
 
@@ -156,7 +211,7 @@ func (p Position) OutputType() OutputType {
 	return PositionOutput
 }
 
-func (p Position) Activate(step uint32) error {
+func (p Position) Activate(positionStep uint32) error {
 	return nil
 }
 
@@ -169,6 +224,6 @@ func (p PositionWithDuration) OutputType() OutputType {
 	return PositionWithDirectionOutput
 }
 
-func (p PositionWithDuration) Activate(step uint32, duration time.Time) error {
+func (p PositionWithDuration) Activate(positionStep uint32, duration time.Time) error {
 	return nil
 }

@@ -9,7 +9,7 @@ type Device struct {
 	DisplayName      string
 	Inputs           []Input
 	Outputs          []Output
-	MsgSender        MessageSender
+	msgSender        MessageSender
 }
 
 type MessageSender interface {
@@ -28,24 +28,19 @@ func FromDeviceList(devlist *message.DeviceList, sender MessageSender) ([]Device
 	return devices, nil
 }
 
-func newDevice(msg message.Device, sender MessageSender) (Device, error) {
-	inputs, err := inputsFromFeatures(msg.Features, sender)
-	if err != nil {
-		return Device{}, err
-	}
-	outputs, err := outputsFromFeatures(msg.Features, sender)
-	if err != nil {
-		return Device{}, err
-	}
-	return Device{
+func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
+	device := Device{
 		Name:             msg.DeviceName,
 		Index:            msg.DeviceIndex,
 		MessageTimingGap: msg.DeviceMessageTimingGap,
 		DisplayName:      msg.DeviceDisplayName,
-		Inputs:           inputs,
-		Outputs:          outputs,
-		MsgSender:        sender,
-	}, nil
+		msgSender:        msgSender,
+	}
+	err := device.registerOutputs(msg.Features)
+	if err != nil {
+		return Device{}, err
+	}
+	return device, nil
 }
 
 type Feature interface {
