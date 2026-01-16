@@ -1,6 +1,10 @@
 package device
 
-import "github.com/CockpitCutie/buttplug-go/message"
+import (
+	"time"
+
+	"github.com/CockpitCutie/buttplug-go/message"
+)
 
 type Output interface {
 	Feature
@@ -50,6 +54,14 @@ func (v Vibrator) OutputType() OutputType {
 	return VibrateOutput
 }
 
+func (v Vibrator) Activate(step uint32) error {
+	return nil
+}
+
+func (v Vibrator) Vibrate(step uint32) error {
+	return v.Activate(step)
+}
+
 type Rotator struct {
 	feature
 	stepCount uint32
@@ -59,14 +71,28 @@ func (r Rotator) OutputType() OutputType {
 	return RotateOutput
 }
 
+func (r Rotator) Activate(step uint32) error {
+	return nil
+}
+
+func (r Rotator) Rotate(step uint32) error {
+	return r.Rotate(step)
+}
+
 type RotatorWithDirection struct {
 	feature
 	stepCount uint32
-	clockwise bool
 }
 
 func (r RotatorWithDirection) OutputType() OutputType {
 	return RotationWithDirectionOutput
+}
+
+func (r RotatorWithDirection) Activate(step uint32, clockwise bool) error {
+	return nil
+}
+func (r RotatorWithDirection) RotateDirection(step uint32, clockwise bool) error {
+	return r.Activate(step, clockwise)
 }
 
 type Oscillator struct {
@@ -78,6 +104,10 @@ func (o Oscillator) OutputType() OutputType {
 	return OscillateOutput
 }
 
+func (o Oscillator) Activate(step uint32) error {
+	return nil
+}
+
 type Constrictor struct {
 	feature
 	stepCount uint32
@@ -85,6 +115,10 @@ type Constrictor struct {
 
 func (c Constrictor) OutputType() OutputType {
 	return ConstrictOutput
+}
+
+func (c Constrictor) Activate(step uint32) error {
+	return nil
 }
 
 type Heater struct {
@@ -96,6 +130,10 @@ func (h Heater) OutputType() OutputType {
 	return HeaterOutput
 }
 
+func (h Heater) Activate(step uint32) error {
+	return nil
+}
+
 type LED struct {
 	feature
 	stepCount uint32
@@ -103,6 +141,10 @@ type LED struct {
 
 func (l LED) OutputType() OutputType {
 	return LEDOutput
+}
+
+func (l LED) Activate(step uint32) error {
+	return nil
 }
 
 type Position struct {
@@ -114,10 +156,19 @@ func (p Position) OutputType() OutputType {
 	return PositionOutput
 }
 
+func (p Position) Activate(step uint32) error {
+	return nil
+}
+
 type PositionWithDuration struct {
+	feature
 	stepCount uint32
 }
 
-func (r PositionWithDuration) OutputType() OutputType {
+func (p PositionWithDuration) OutputType() OutputType {
 	return PositionWithDirectionOutput
+}
+
+func (p PositionWithDuration) Activate(step uint32, duration time.Time) error {
+	return nil
 }
