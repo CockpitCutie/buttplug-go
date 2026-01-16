@@ -1,120 +1,73 @@
 package device
 
-import (
-	"github.com/CockpitCutie/buttplug-go/message"
-)
+import "github.com/CockpitCutie/buttplug-go/message"
 
 type Device struct {
 	Name             string
 	Index            uint
-	MessageTimingGap *uint
-	DisplayName      *string
-	actuators        []Actuator
-	sensors          []Sensor
-	messageSender    MessageSender
+	MessageTimingGap uint
+	DisplayName      string
+	Inputs           []Input
+	Outputs          []Output
+	MsgSender        MessageSender
 }
 
-func FromMessage(msg message.Device, sender MessageSender) Device {
-	device := Device{
+type MessageSender interface {
+	SendRecv(message.Message) (message.Message, error)
+}
+
+func FromDeviceList(devlist *message.DeviceList, sender MessageSender) ([]Device, error) {
+	var devices []Device
+	for _, msg := range devlist.Devices {
+		dev, err := newDevice(msg, sender)
+		if err != nil {
+			return nil, err
+		}
+		devices = append(devices, dev)
+	}
+	return devices, nil
+}
+
+func newDevice(msg message.Device, sender MessageSender) (Device, error) {
+	inputs, err := inputsFromFeatures(msg.Features, sender)
+	if err != nil {
+		return Device{}, err
+	}
+	outputs, err := outputsFromFeatures(msg.Features, sender)
+	if err != nil {
+		return Device{}, err
+	}
+	return Device{
 		Name:             msg.DeviceName,
 		Index:            msg.DeviceIndex,
 		MessageTimingGap: msg.DeviceMessageTimingGap,
 		DisplayName:      msg.DeviceDisplayName,
-		messageSender:    sender,
-	}
-	for cmdLabel, attrs := range msg.DeviceMessages {
-		cmd := Command(cmdLabel)
-		isActuator := cmd == ScalarCmd || cmd == LinearCmd || cmd == RotateCmd
-		isSensor := cmd == SensorReadCmd || cmd == SensorSubscribeCmd
-		if isActuator {
-			device.addActuators(cmd, attrs.Attrs)
-		} else if isSensor {
-			device.addSensors(cmd, attrs.Attrs)
-		}
-	}
-	return device
+		Inputs:           inputs,
+		Outputs:          outputs,
+		MsgSender:        sender,
+	}, nil
 }
 
-func (d *Device) addActuators(cmd Command, attrs []message.Attributes) {
-	for i, attrs := range attrs {
-		d.actuators = append(d.actuators, Actuator{
-			Index:         uint(i),
-			Descriptor:    *attrs.FeatureDescriptor,
-			Type:          ActuatorType(*attrs.ActuatorType),
-			StepCount:     *attrs.StepCount,
-			Command:       cmd,
-			DeviceIndex:   d.Index,
-			messageSender: d.messageSender,
-		})
-	}
+type Feature interface {
+	Description() string
+	Index() uint32
+	Sender() MessageSender
 }
 
-func (d *Device) addSensors(cmd Command, attrs []message.Attributes) {
-	for i, attrs := range attrs {
-		d.sensors = append(d.sensors, Sensor{
-			Index:         uint(i),
-			Descriptor:    *attrs.FeatureDescriptor,
-			Type:          SensorType(*attrs.SensorType),
-			Range:         attrs.SensorRange,
-			Command:       cmd,
-			messageSender: d.messageSender,
-		})
-	}
+type feature struct {
+	description string
+	index       uint32
+	sender      MessageSender
 }
 
-func (d *Device) Actuators() []Actuator {
-	return d.actuators
+func (f feature) Description() string {
+	return f.description
 }
 
-func (d *Device) Sensors() []Sensor {
-	return d.sensors
+func (f feature) Index() uint32 {
+	return f.index
 }
 
-func (d *Device) Vibrate(intensity float64) error {
-	var scalars []message.Scalar
-	for _, actuator := range d.actuators {
-		if actuator.Type == VibrateActuator {
-			actuator.Vibrate(intensity)
-		}
-	}
-	_, err := d.messageSender.SendRecv(&message.ScalarCmd{
-		DeviceIndex: d.Index,
-		Scalars:     scalars,
-	})
-	return err
-}
-
-func (d *Device) Rotate(intensity float64) error {
-	return nil
-}
-
-func (d *Device) Oscillate(intensity float64) error {
-	return nil
-}
-
-func (d *Device) Constrict(intensity float64) error {
-	return nil
-}
-
-func (d *Device) Inflate(intensity float64) error {
-	return nil
-}
-
-func (d *Device) Position(intensity float64) error {
-	return nil
-}
-
-type Command string
-
-const (
-	ScalarCmd          Command = "ScalarCmd"
-	RotateCmd          Command = "RotateCmd"
-	LinearCmd          Command = "LinearCmd"
-	SensorReadCmd      Command = "SensorReadCmd"
-	SensorSubscribeCmd Command = "SensorSubscribeCmd"
-	StopDeviceCmd      Command = ""
-)
-
-type MessageSender interface {
-	SendRecv(message.Message) (message.Message, error)
+func (f feature) Sender() MessageSender {
+	return f.sender
 }

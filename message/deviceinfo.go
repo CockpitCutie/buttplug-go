@@ -10,10 +10,12 @@ type Device struct {
 	DeviceIndex            uint
 	DeviceMessageTimingGap uint   `json:",omitempty"`
 	DeviceDisplayName      string `json:",omitempty"`
-	Features               map[string]DeviceFeatures
+	Features               DeviceFeatures
 }
 
-type DeviceFeatures struct {
+type DeviceFeatures map[string]DeviceFeature
+
+type DeviceFeature struct {
 	FeatureDescription string
 	FeatureIndex       uint32
 	Output             DeviceOutput
