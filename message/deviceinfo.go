@@ -1,24 +1,6 @@
 package message
 
-import (
-	"encoding/json"
-)
-
-type StartScanning struct {
-	message
-}
-
-type StopScanning struct {
-	message
-}
-
-type ScanningFinished struct {
-	message
-}
-
-type RequestDeviceList struct {
-	message
-}
+import "encoding/json"
 
 type DeviceList struct {
 	message
