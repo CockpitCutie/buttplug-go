@@ -16,17 +16,17 @@ type Device struct {
 type DeviceFeatures struct {
 	FeatureDescription string
 	FeatureIndex       uint32
-	Output             map[string]DeviceOutput
-	Input              map[string]DeviceInput
+	Output             DeviceOutput
+	Input              DeviceInput
 }
 
-type DeviceOutput struct {
+type DeviceOutput map[string]struct {
 	Value    *[2]int
 	Position *[2]uint
 	Duration *[2]uint
 }
 
-type DeviceInput struct {
+type DeviceInput map[string]struct {
 	Value   *[2]int
 	Command []string
 }
