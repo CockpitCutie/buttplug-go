@@ -16,12 +16,11 @@ func TestDeserializeOk(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*Ok); ok {
+	if msg, ok := msg[0].(*Ok); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type Ok")
 	}
-
 }
 
 func TestDeserializeError(t *testing.T) {
@@ -36,7 +35,7 @@ func TestDeserializeError(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*Error); ok {
+	if msg, ok := msg[0].(*Error); ok {
 		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Server received invalid JSON.", msg.Message, "Expected ErrorMessage 'Server received invalid JSON.' found '%s'", msg.Message)
 		assert.Equalf(t, MsgError, msg.Code, "Expected ErrorCode MsgError found %d", msg.Code)
@@ -55,7 +54,7 @@ func TestDeserializePing(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*Ping); ok {
+	if msg, ok := msg[0].(*Ping); ok {
 		assert.Equalf(t, uint32(5), msg.ID(), "Expected Id 5 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type Ping")
@@ -75,7 +74,7 @@ func TestDeserializeRequestServerInfo(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*RequestServerInfo); ok {
+	if msg, ok := msg[0].(*RequestServerInfo); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Client", msg.ClientName, "Expected ClientName 'Test Client' found '%s'", msg.ClientName)
 		assert.Equalf(t, uint(4), msg.ProtocolVersionMajor, "Expected ProtoMajor 1 found %d", msg.ProtocolVersionMajor)
@@ -99,7 +98,7 @@ func TestServerInfo(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*ServerInfo); ok {
+	if msg, ok := msg[0].(*ServerInfo); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Server", msg.ServerName, "Expected ServerName 'Test Server' found '%s'", msg.ServerName)
 		assert.Equalf(t, uint(100), msg.MaxPingTime, "Expected MaxPingTime 100 found %d", msg.MaxPingTime)
@@ -120,7 +119,7 @@ func TestDeserializeStartScanning(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*StartScanning); ok {
+	if msg, ok := msg[0].(*StartScanning); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type StartScanning")
@@ -137,7 +136,7 @@ func TestDeserializeStopScanning(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*StopScanning); ok {
+	if msg, ok := msg[0].(*StopScanning); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type StopScanning")
@@ -154,7 +153,7 @@ func TestDeserializeScanningFinished(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*ScanningFinished); ok {
+	if msg, ok := msg[0].(*ScanningFinished); ok {
 		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 0 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type ScanningFinished")
@@ -171,7 +170,7 @@ func TestDeserializeRequestDeviceList(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*RequestDeviceList); ok {
+	if msg, ok := msg[0].(*RequestDeviceList); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type RequestDeviceList")
@@ -270,7 +269,7 @@ func TestDeserializeDeviceList(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*DeviceList); ok {
+	if msg, ok := msg[0].(*DeviceList); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		if dev0, ok := msg.Devices["0"]; assert.True(t, ok) {
 			assert.Equal(t, uint(0), dev0.DeviceIndex)
@@ -334,7 +333,7 @@ func TestDeserializeStopDeviceCmd(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*StopDeviceCmd); ok {
+	if msg, ok := msg[0].(*StopDeviceCmd); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equal(t, uint(0), msg.DeviceIndex)
 		assert.Equal(t, true, *msg.Inputs)
@@ -356,7 +355,7 @@ func TestDeserializeStopAllDevices(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*StopAllDevices); ok {
+	if msg, ok := msg[0].(*StopAllDevices); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equal(t, true, *msg.Inputs)
 		assert.Equal(t, true, *msg.Outputs)
@@ -380,7 +379,7 @@ func TestDeserializeOutputCmdVibrate(t *testing.T) {
   }]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
-	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
 		assert.Equal(t, uint32(1), msg.Id)
 		assert.Equal(t, uint(0), msg.DeviceIndex)
 		assert.Equal(t, uint(0), msg.FeatureIndex)
@@ -406,7 +405,7 @@ func TestDeserializeOutputCmdRotationWithDirection(t *testing.T) {
   }]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
-	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
 		assert.Equal(t, uint32(1), msg.Id)
 		assert.Equal(t, uint(0), msg.DeviceIndex)
 		assert.Equal(t, uint(0), msg.FeatureIndex)
@@ -433,7 +432,7 @@ func TestDeserializeOutputCmdPositionWithDuration(t *testing.T) {
   }]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
-	if msg, ok := msg.(*OutputCmd); assert.True(t, ok) {
+	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
 		assert.Equal(t, uint32(1), msg.Id)
 		assert.Equal(t, uint(0), msg.DeviceIndex)
 		assert.Equal(t, uint(0), msg.FeatureIndex)
@@ -442,4 +441,37 @@ func TestDeserializeOutputCmdPositionWithDuration(t *testing.T) {
 	} else {
 		t.Errorf("Deserialized message is not of type OutputCmd")
 	}
+}
+
+func TestDeserializeMultipleMessages(t *testing.T) {
+	jsonMessage := `[
+  {
+    "OutputCmd": {
+      "Id": 1,
+      "DeviceIndex": 0,
+      "FeatureIndex": 0,
+      "Command": {
+        "Vibrate": {
+          "Value": 10
+        }
+      }
+    }
+  },
+  {
+    "OutputCmd": {
+      "Id": 2,
+      "DeviceIndex": 1,
+      "FeatureIndex": 0,
+      "Command": {
+        "PositionWithDuration": {
+          "Position": 91,
+          "Duration": 150
+        }
+      }
+    }
+  }
+]`
+	msgs, err := Deserialize([]byte(jsonMessage))
+	assert.NoError(t, err)
+	assert.Len(t, msgs, 2)
 }

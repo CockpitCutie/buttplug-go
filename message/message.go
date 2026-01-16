@@ -38,71 +38,75 @@ func Serialize(m Message) (string, error) {
 	return fmt.Sprintf(`[{"%s":%s}]`, messageKind, string(serialized)), nil
 }
 
-func Deserialize(b []byte) (Message, error) {
-	println(string(b))
-	msgs := []map[string]json.RawMessage{}
-	err := json.Unmarshal(b, &msgs)
-	if err != nil || len(msgs) == 0 {
+func Deserialize(b []byte) ([]Message, error) {
+	rawMsgs := []map[string]json.RawMessage{}
+	err := json.Unmarshal(b, &rawMsgs)
+	if err != nil || len(rawMsgs) == 0 {
 		return nil, err
 	}
-	msg := msgs[0]
-	for key, value := range msg {
-		switch key {
-		case "Ok":
-			var ok Ok
-			err = json.Unmarshal(value, &ok)
-			return &ok, err
-		case "Error":
-			var errMsg Error
-			err = json.Unmarshal(value, &errMsg)
-			return &errMsg, err
-		case "Ping":
-			var ping Ping
-			err = json.Unmarshal(value, &ping)
-			return &ping, err
-		case "RequestServerInfo":
-			var reqInfo RequestServerInfo
-			err = json.Unmarshal(value, &reqInfo)
-			return &reqInfo, err
-		case "ServerInfo":
-			var serverInfo ServerInfo
-			err = json.Unmarshal(value, &serverInfo)
-			return &serverInfo, err
-		case "StartScanning":
-			var startScan StartScanning
-			err = json.Unmarshal(value, &startScan)
-			return &startScan, err
-		case "StopScanning":
-			var stopScan StopScanning
-			err = json.Unmarshal(value, &stopScan)
-			return &stopScan, err
-		case "ScanningFinished":
-			var scanFinished ScanningFinished
-			err = json.Unmarshal(value, &scanFinished)
-			return &scanFinished, err
-		case "RequestDeviceList":
-			var reqDevList RequestDeviceList
-			err = json.Unmarshal(value, &reqDevList)
-			return &reqDevList, err
-		case "DeviceList":
-			var devList DeviceList
-			err = json.Unmarshal(value, &devList)
-			return &devList, err
-		case "StopDeviceCmd":
-			var stopDev StopDeviceCmd
-			err = json.Unmarshal(value, &stopDev)
-			return &stopDev, err
-		case "StopAllDevices":
-			var stopAll StopAllDevices
-			err = json.Unmarshal(value, &stopAll)
-			return &stopAll, err
-		case "OutputCmd":
-			var outputCmd OutputCmd
-			err = json.Unmarshal(value, &outputCmd)
-			return &outputCmd, err
-		default:
-			return nil, fmt.Errorf("unknown message type: %s", key)
+	var msgs []Message
+	for _, msg := range rawMsgs {
+		for key, value := range msg {
+			switch key {
+			case "Ok":
+				var ok Ok
+				err = json.Unmarshal(value, &ok)
+				msgs = append(msgs, &ok)
+			case "Error":
+				var errMsg Error
+				err = json.Unmarshal(value, &errMsg)
+				msgs = append(msgs, &errMsg)
+			case "Ping":
+				var ping Ping
+				err = json.Unmarshal(value, &ping)
+				msgs = append(msgs, &ping)
+			case "RequestServerInfo":
+				var reqInfo RequestServerInfo
+				err = json.Unmarshal(value, &reqInfo)
+				msgs = append(msgs, &reqInfo)
+			case "ServerInfo":
+				var serverInfo ServerInfo
+				err = json.Unmarshal(value, &serverInfo)
+				msgs = append(msgs, &serverInfo)
+			case "StartScanning":
+				var startScan StartScanning
+				err = json.Unmarshal(value, &startScan)
+				msgs = append(msgs, &startScan)
+			case "StopScanning":
+				var stopScan StopScanning
+				err = json.Unmarshal(value, &stopScan)
+				msgs = append(msgs, &stopScan)
+			case "ScanningFinished":
+				var scanFinished ScanningFinished
+				err = json.Unmarshal(value, &scanFinished)
+				msgs = append(msgs, &scanFinished)
+			case "RequestDeviceList":
+				var reqDevList RequestDeviceList
+				err = json.Unmarshal(value, &reqDevList)
+				msgs = append(msgs, &reqDevList)
+			case "DeviceList":
+				var devList DeviceList
+				err = json.Unmarshal(value, &devList)
+				msgs = append(msgs, &devList)
+			case "StopDeviceCmd":
+				var stopDev StopDeviceCmd
+				err = json.Unmarshal(value, &stopDev)
+				msgs = append(msgs, &stopDev)
+			case "StopAllDevices":
+				var stopAll StopAllDevices
+				err = json.Unmarshal(value, &stopAll)
+				msgs = append(msgs, &stopAll)
+			case "OutputCmd":
+				var outputCmd OutputCmd
+				err = json.Unmarshal(value, &outputCmd)
+				msgs = append(msgs, &outputCmd)
+			default:
+				return nil, fmt.Errorf("unknown message type: %s", key)
+			}
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return nil, fmt.Errorf("no message found")
+	return msgs, nil
 }
