@@ -92,14 +92,6 @@ func Deserialize(b []byte) (Message, error) {
 			var stopAll StopAllDevices
 			err = json.Unmarshal(value, &stopAll)
 			return &stopAll, err
-		case "DeviceAdded":
-			var devAdded DeviceAdded
-			err = json.Unmarshal(value, &devAdded)
-			return &devAdded, err
-		case "DeviceRemoved":
-			var devRemoved DeviceRemoved
-			err = json.Unmarshal(value, &devRemoved)
-			return &devRemoved, err
 		default:
 			return nil, fmt.Errorf("unknown message type: %s", key)
 		}

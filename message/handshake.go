@@ -4,7 +4,7 @@ type RequestServerInfo struct {
 	message
 	ClientName           string
 	ProtocolVersionMajor uint
-	ProtocolMinorVersion uint
+	ProtocolVersionMinor uint
 }
 
 type ServerInfo struct {
@@ -12,5 +12,5 @@ type ServerInfo struct {
 	ServerName           string
 	MaxPingTime          uint
 	ProtocolVersionMajor uint
-	ProtocolMinorVersion uint
+	ProtocolVersionMinor uint
 }

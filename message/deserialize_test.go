@@ -68,7 +68,8 @@ func TestDeserializeRequestServerInfo(t *testing.T) {
     "RequestServerInfo": {
       "Id": 1,
       "ClientName": "Test Client",
-      "MessageVersion": 1
+      "ProtocolVersionMajor": 4,
+      "ProtocolVersionMinor": 0
     }
   }
 ]`
@@ -77,7 +78,8 @@ func TestDeserializeRequestServerInfo(t *testing.T) {
 	if msg, ok := msg.(*RequestServerInfo); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Client", msg.ClientName, "Expected ClientName 'Test Client' found '%s'", msg.ClientName)
-		assert.Equalf(t, uint(1), msg.MessageVersion, "Expected MessageVersion 1 found %d", msg.MessageVersion)
+		assert.Equalf(t, uint(4), msg.ProtocolVersionMajor, "Expected ProtoMajor 1 found %d", msg.ProtocolVersionMajor)
+		assert.Equalf(t, uint(0), msg.ProtocolVersionMinor, "Expected ProtoMinor 1 found %d", msg.ProtocolVersionMinor)
 	} else {
 		t.Errorf("Deserialized message is not of type RequestServerInfo")
 	}
@@ -89,8 +91,9 @@ func TestServerInfo(t *testing.T) {
     "ServerInfo": {
       "Id": 1,
       "ServerName": "Test Server",
-      "MessageVersion": 1,
-      "MaxPingTime": 100
+      "MaxPingTime": 100,
+      "ProtocolVersionMajor": 4,
+      "ProtocolVersionMinor": 0
     }
   }
 ]`
@@ -99,8 +102,9 @@ func TestServerInfo(t *testing.T) {
 	if msg, ok := msg.(*ServerInfo); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Server", msg.ServerName, "Expected ServerName 'Test Server' found '%s'", msg.ServerName)
-		assert.Equalf(t, uint(1), msg.MessageVersion, "Expected MessageVersion 1 found %d", msg.MessageVersion)
 		assert.Equalf(t, uint(100), msg.MaxPingTime, "Expected MaxPingTime 100 found %d", msg.MaxPingTime)
+		assert.Equalf(t, uint(4), msg.ProtocolVersionMajor, "Expected ProtoMajor 4 found %d", msg.ProtocolVersionMajor)
+		assert.Equalf(t, uint(0), msg.ProtocolVersionMinor, "Expected ProtoMinor 0 found %d", msg.ProtocolVersionMinor)
 	} else {
 		t.Errorf("Deserialized message is not of type ServerInfo")
 	}
@@ -179,41 +183,88 @@ func TestDeserializeDeviceList(t *testing.T) {
   {
     "DeviceList": {
       "Id": 1,
-      "Devices": [
-        {
+      "Devices": {
+        "0": {
           "DeviceName": "Test Vibrator",
           "DeviceIndex": 0,
-          "DeviceMessages": {
-            "ScalarCmd": [
-              {
-                "StepCount": 20,
-                "FeatureDescriptor": "Clitoral Stimulator",
-                "ActuatorType": "Vibrate"
-              },
-              {
-                "StepCount": 20,
-                "FeatureDescriptor": "Insertable Vibrator",
-                "ActuatorType": "Vibrate"
+          "Features": {
+            "0": {
+              "FeatureIndex": 0,
+              "FeatureDescription": "Clitoral Stimulator",
+              "Output": {
+                "Vibrate": {
+                  "Value": [0, 20]
+                }
               }
-            ],
-            "StopDeviceCmd": {}
+            },
+            "1": {
+              "FeatureIndex": 1,
+              "FeatureDescription": "Insertable Stimulator",
+              "Output": {
+                "Vibrate": {
+                  "Value": [0, 20]
+                }
+              }
+            },
+            "2": {
+              "FeatureIndex": 2,
+              "FeatureDescription": "Rotating Head with Directional Control",
+              "Output": {
+                "Vibrate": {
+                  "Value": [-20, 20]
+                }
+              }
+            },
+            "3": {
+              "FeatureIndex": 3,
+              "FeatureDescription": "Battery",
+              "Input": {
+                "Battery": {
+                  "Value": [0, 100],
+                  "Command": ["Read"]
+                }
+              }
+            }
           }
         },
-        {
+        "1": {
           "DeviceName": "Test Stroker",
           "DeviceIndex": 1,
           "DeviceMessageTimingGap": 100,
           "DeviceDisplayName": "User set name",
-          "DeviceMessages": {
-            "LinearCmd": [ {
-              "StepCount": 100,
-              "FeatureDescriptor": "Stroker",
-              "ActuatorType": "Linear"
-            } ],
-            "StopDeviceCmd": {}
+          "Features": {
+            "0": {
+              "FeatureIndex": 0,
+              "FeatureDescription": "Stroker",
+              "Output": {
+                "PositionWithDuration": {
+                  "Position": [0, 100],
+                  "Duration": [0, 100000]
+                },
+                "Position": {
+                  "Position": [0, 100]
+                }
+              },
+              "Input": {
+                "Position": {
+                  "Value": [0, 100],
+                  "Command": ["Read", "Subscribe"]
+                }
+              }
+            },
+            "2": {
+              "FeatureIndex": 2,
+              "FeatureDescription": "Bluetooth Radio RSSI",
+              "Input": {
+                "RSSI": {
+                  "Value": [-10, -100],
+                  "Command": ["Read"]
+                }
+              }
+            }
           }
         }
-      ]
+      }
     }
   }
 ]`
@@ -221,67 +272,51 @@ func TestDeserializeDeviceList(t *testing.T) {
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg.(*DeviceList); ok {
 		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
-		assert.Equalf(t, 2, len(msg.Devices), "Expected 2 devices found %d", len(msg.Devices))
+		if dev0, ok := msg.Devices["0"]; assert.True(t, ok) {
+			assert.Equal(t, uint(0), dev0.DeviceIndex)
+			assert.Equal(t, "Test Vibrator", dev0.DeviceName)
+			assert.Nil(t, dev0.DeviceDisplayName)
+			assert.Nil(t, dev0.DeviceMessageTimingGap)
+			if feat, ok := dev0.Features["0"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(0), feat.FeatureIndex)
+				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+			}
+			if feat, ok := dev0.Features["1"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(1), feat.FeatureIndex)
+				assert.Equal(t, "Insertable Stimulator", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{0, 20}}}, feat.Output)
+			}
+			if feat, ok := dev0.Features["2"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(2), feat.FeatureIndex)
+				assert.Equal(t, "Rotating Head with Directional Control", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: &[2]int{-20, 20}}}, feat.Output)
+			}
+			if feat, ok := dev0.Features["3"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(3), feat.FeatureIndex)
+				assert.Equal(t, "Battery", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceInput{"Battery": {Value: &[2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
+			}
+		}
+		if dev1, ok := msg.Devices["1"]; assert.True(t, ok) {
+			assert.Equal(t, uint(1), dev1.DeviceIndex)
+			assert.Equal(t, "Test Stroker", dev1.DeviceName)
+			assert.Equal(t, "User set name", *dev1.DeviceDisplayName)
+			assert.Equal(t, uint(100), *dev1.DeviceMessageTimingGap)
+			if feat, ok := dev1.Features["0"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(0), feat.FeatureIndex)
+				assert.Equal(t, "Stroker", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceOutput{
+					"PositionWithDuration": {Position: &[2]uint{0, 100}, Duration: &[2]uint{0, 100000}},
+					"Position":             {Position: &[2]uint{0, 100}}}, feat.Output)
+			}
+			if feat, ok := dev1.Features["2"]; assert.True(t, ok) {
+				assert.Equal(t, uint32(2), feat.FeatureIndex)
+				assert.Equal(t, "Bluetooth Radio RSSI", feat.FeatureDescription)
+				assert.Equal(t, map[string]DeviceInput{"RSSI": {Value: &[2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
+			}
+		}
 	} else {
 		t.Errorf("Deserialized message is not of type DeviceList")
-	}
-}
-
-func TestDeserializeDeviceAdded(t *testing.T) {
-	jsonMessage := `[
-  {
-    "DeviceAdded": {
-      "Id": 0,
-      "DeviceName": "Test Vibrator",
-      "DeviceIndex": 0,
-      "DeviceMessageTimingGap": 100,
-      "DeviceDisplayName": "Rabbit Vibrator",
-      "DeviceMessages": {
-        "ScalarCmd": [
-          {
-            "StepCount": 20,
-            "FeatureDescriptor": "Clitoral Stimulator",
-            "ActuatorType": "Vibrate"
-          },
-          {
-            "StepCount": 20,
-            "FeatureDescriptor": "Insertable Vibrator",
-            "ActuatorType": "Vibrate"
-          }
-        ],
-        "StopDeviceCmd": {}
-       }
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*DeviceAdded); ok {
-		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 0 found %d", msg.ID())
-		assert.Equalf(t, "Test Vibrator", msg.DeviceName, "Expected DeviceName 'Test Vibrator' found '%s'", msg.DeviceName)
-		assert.Equalf(t, uint(0), msg.DeviceIndex, "Expected DeviceIndex 0 found %d", msg.DeviceIndex)
-		assert.Equalf(t, uint(100), *msg.DeviceMessageTimingGap, "Expected DeviceMessageTimingGap 100 found %d", *msg.DeviceMessageTimingGap)
-		assert.Equalf(t, "Rabbit Vibrator", *msg.DeviceDisplayName, "Expected DeviceDisplayName 'Rabbit Vibrator' found '%s'", *msg.DeviceDisplayName)
-	} else {
-		t.Errorf("Deserialized message is not of type DeviceAdded")
-	}
-}
-
-func TestDeserializeDeviceRemoved(t *testing.T) {
-	jsonMessage := `[
-  {
-    "DeviceRemoved": {
-      "Id": 0,
-      "DeviceIndex": 0
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg.(*DeviceRemoved); ok {
-		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 0 found %d", msg.ID())
-		assert.Equalf(t, uint(0), msg.DeviceIndex, "Expected DeviceIndex 0 found %d", msg.DeviceIndex)
-	} else {
-		t.Errorf("Deserialized message is not of type DeviceRemoved")
 	}
 }
