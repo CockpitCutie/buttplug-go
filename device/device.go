@@ -40,19 +40,24 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 	if err != nil {
 		return Device{}, err
 	}
+	err = device.registerInputs(msg.Features)
+	if err != nil {
+		return Device{}, err
+	}
+	
 	return device, nil
 }
 
 type Feature interface {
 	Description() string
 	Index() uint32
-	Sender() MessageSender
+	Device() *Device
 }
 
 type feature struct {
 	description string
 	index       uint32
-	sender      MessageSender
+	device      *Device
 }
 
 func (f feature) Description() string {
@@ -63,6 +68,6 @@ func (f feature) Index() uint32 {
 	return f.index
 }
 
-func (f feature) Sender() MessageSender {
-	return f.sender
+func (f feature) Device() *Device {
+	return f.device
 }
