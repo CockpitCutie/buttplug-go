@@ -1,6 +1,8 @@
 package device
 
 import (
+	"fmt"
+
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
@@ -19,26 +21,43 @@ const (
 	ButtonInput   InputType = "Button"
 )
 
-func inputsFromFeatures(features message.DeviceFeatures, sender MessageSender) ([]Input, error) {
+func (d *Device) registerInputs(features message.DeviceFeatures) error {
 	var inputs []Input
 	for _, featureMsg := range features {
 		feature := feature{
 			description: featureMsg.FeatureDescription,
-			index: featureMsg.FeatureIndex,
-			sender: sender,
+			index:       featureMsg.FeatureIndex,
+			device:      d,
 		}
 		if featureMsg.Input == nil {
 			continue
 		}
 		for kind, properties := range featureMsg.Input {
-			_, _ = kind, properties
+			input, err := makeInput(InputType(kind), properties, feature)
+			if err != nil {
+				return err
+			}
+			inputs = append(inputs, input)
 		}
-		inputs = append(inputs, Battery{feature: feature})
+
 	}
-	return inputs, nil
+	return nil
 }
 
-func makeInput(kind InputType, properties message.DeviceInput)
+func makeInput(kind InputType, properties message.DeviceInput, feature feature) (Input, error) {
+	switch kind {
+	case BatteryInput:
+		return Battery{feature: feature}, nil
+	case RSSIInput:
+		return RSSI{feature: feature, readRange: properties.Value}, nil
+	case PressureInput:
+		return Pressure{feature: feature, readRange: properties.Value}, nil
+	case ButtonInput:
+		return Button{feature: feature}, nil
+	default:
+		return nil, fmt.Errorf("unknown input type: %s", kind)
+	}
+}
 
 type Battery struct {
 	feature

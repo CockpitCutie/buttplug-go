@@ -31,7 +31,7 @@ func (d *Device) registerOutputs(features message.DeviceFeatures) error {
 		feature := feature{
 			description: featureMsg.FeatureDescription,
 			index:       featureMsg.FeatureIndex,
-			sender:      d.msgSender,
+			device:      d,
 		}
 		_ = feature
 		if featureMsg.Input == nil {
@@ -52,47 +52,47 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 	switch kind {
 	case VibrateOutput:
 		return Vibrator{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case RotateOutput:
 		return Rotator{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case RotationWithDirectionOutput:
 		return RotatorWithDirection{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case OscillateOutput:
 		return Oscillator{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case ConstrictOutput:
 		return Constrictor{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case HeaterOutput:
 		return Heater{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case LEDOutput:
 		return LED{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case PositionOutput:
 		return Position{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	case PositionWithDirectionOutput:
 		return PositionWithDuration{
-			feature: feature,
+			feature:   feature,
 			stepCount: uint32(properties.Value[1]),
 		}, nil
 	default:
@@ -102,7 +102,7 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 
 type Vibrator struct {
 	feature
-	stepRange []int32
+	stepCount uint32
 }
 
 func (v Vibrator) OutputType() OutputType {

@@ -29,6 +29,6 @@ type DeviceOutput struct {
 }
 
 type DeviceInput struct {
-	Value   []int
+	Value   [2]int32
 	Command []string
 }
