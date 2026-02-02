@@ -34,7 +34,7 @@ func (d *Device) registerOutputs(features message.DeviceFeatures) error {
 			device:      d,
 		}
 		_ = feature
-		if featureMsg.Input == nil {
+		if featureMsg.Output == nil {
 			continue
 		}
 		for kind, properties := range featureMsg.Output {
