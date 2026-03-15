@@ -22,7 +22,6 @@ const (
 )
 
 func (d *Device) registerInputs(features message.DeviceFeatures) error {
-	var inputs []Input
 	for _, featureMsg := range features {
 		feature := feature{
 			description: featureMsg.FeatureDescription,
@@ -37,7 +36,7 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 			if err != nil {
 				return err
 			}
-			inputs = append(inputs, input)
+			d.Inputs[input.Index()] = input
 		}
 
 	}

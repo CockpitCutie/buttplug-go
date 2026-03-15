@@ -42,7 +42,7 @@ func (c *Client) Connect(connector Connector) error {
 
 func (c *Client) onConnect() error {
 	recv, err := c.connector.SendRecv(&message.RequestServerInfo{
-		ClientName:     c.name,
+		ClientName:           c.name,
 		ProtocolVersionMajor: ProtoVersionMajor,
 		ProtocolVersionMinor: ProtoVersionMinor,
 	})
@@ -98,14 +98,8 @@ func (c *Client) Devices() ([]device.Device, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if devicelist, ok := devicelist.(*message.DeviceList); ok {
-		fmt.Printf("%+v", devicelist)
-		var devices []device.Device
-		for _, d := range devicelist.Devices {
-			devices = append(devices, device.FromMessage(d, c.connector))
-		}
-		return devices, nil
+		return device.FromDeviceList(devicelist, c.connector)
 	}
 	return nil, fmt.Errorf("expected DeviceList, found %T", devicelist)
 }
