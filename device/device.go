@@ -48,6 +48,96 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 	return device, nil
 }
 
+func (d Device) Vibrators() []Vibrator {
+	var outputs []Vibrator
+	for _, output := range d.Outputs {
+		if output, ok := output.(Vibrator); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) Rotators() []Rotator {
+	var outputs []Rotator
+	for _, output := range d.Outputs {
+		if output, ok := output.(Rotator); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) RotatorsWithDirection() []RotatorWithDirection {
+	var outputs []RotatorWithDirection
+	for _, output := range d.Outputs {
+		if output, ok := output.(RotatorWithDirection); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) Oscillators() []Oscillator {
+	var outputs []Oscillator
+	for _, output := range d.Outputs {
+		if output, ok := output.(Oscillator); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) Constrictors() []Constrictor {
+	var outputs []Constrictor
+	for _, output := range d.Outputs {
+		if output, ok := output.(Constrictor); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) Heaters() []Heater {
+	var outputs []Heater
+	for _, output := range d.Outputs {
+		if output, ok := output.(Heater); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) LEDs() []LED {
+	var outputs []LED
+	for _, output := range d.Outputs {
+		if output, ok := output.(LED); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) Positioners() []Position {
+	var outputs []Position
+	for _, output := range d.Outputs {
+		if output, ok := output.(Position); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
+func (d Device) PositionersWithDuration() []PositionWithDuration {
+	var outputs []PositionWithDuration
+	for _, output := range d.Outputs {
+		if output, ok := output.(PositionWithDuration); ok {
+			outputs = append(outputs, output)
+		}
+	}
+	return outputs
+}
+
 type Feature interface {
 	Description() string
 	Index() uint32
