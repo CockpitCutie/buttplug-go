@@ -7,8 +7,8 @@ type Device struct {
 	Index            uint
 	MessageTimingGap uint
 	DisplayName      string
-	Inputs           []Input
-	Outputs          []Output
+	Inputs           map[uint32]Input
+	Outputs          map[uint32]Output
 	msgSender        MessageSender
 }
 
@@ -35,6 +35,8 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 		MessageTimingGap: msg.DeviceMessageTimingGap,
 		DisplayName:      msg.DeviceDisplayName,
 		msgSender:        msgSender,
+		Inputs:           make(map[uint32]Input),
+		Outputs:          make(map[uint32]Output),
 	}
 	err := device.registerOutputs(msg.Features)
 	if err != nil {
@@ -44,7 +46,7 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 	if err != nil {
 		return Device{}, err
 	}
-	
+
 	return device, nil
 }
 

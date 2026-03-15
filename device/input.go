@@ -9,7 +9,7 @@ import (
 type Input interface {
 	Feature
 	InputType() InputType
-	ReadRange() [2]int32
+	ReadRange() [2]int
 }
 
 type InputType string
@@ -67,8 +67,8 @@ func (b Battery) InputType() InputType {
 	return BatteryInput
 }
 
-func (b Battery) ReadRange() [2]int32 {
-	return [2]int32{0, 100}
+func (b Battery) ReadRange() [2]int {
+	return [2]int{0, 100}
 }
 
 func (b Battery) Read() uint8 {
@@ -81,14 +81,14 @@ func (b Battery) Percentage() uint8 {
 
 type RSSI struct {
 	feature
-	readRange [2]int32
+	readRange [2]int
 }
 
 func (r RSSI) InputType() InputType {
 	return RSSIInput
 }
 
-func (r RSSI) ReadRange() [2]int32 {
+func (r RSSI) ReadRange() [2]int {
 	return r.readRange
 }
 
@@ -98,18 +98,18 @@ func (r RSSI) Read() int8 {
 
 type Pressure struct {
 	feature
-	readRange [2]int32
+	readRange [2]int
 }
 
 func (p Pressure) InputType() InputType {
 	return PressureInput
 }
 
-func (p Pressure) ReadRange() [2]int32 {
+func (p Pressure) ReadRange() [2]int {
 	return p.readRange
 }
 
-func (p Pressure) Read() uint32 {
+func (p Pressure) Read() uint {
 	return 0 // TODO
 }
 
@@ -121,8 +121,8 @@ func (b Button) InputType() InputType {
 	return ButtonInput
 }
 
-func (b Button) ReadRange() [2]int32 {
-	return [2]int32{0, 1}
+func (b Button) ReadRange() [2]int {
+	return [2]int{0, 1}
 }
 
 func (b Button) Read() uint8 {

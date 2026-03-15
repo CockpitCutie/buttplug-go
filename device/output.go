@@ -42,7 +42,7 @@ func (d *Device) registerOutputs(features message.DeviceFeatures) error {
 			if err != nil {
 				return err
 			}
-			d.Outputs = append(d.Outputs, output)
+			d.Outputs[output.Index()] = output
 		}
 	}
 	return nil

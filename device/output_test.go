@@ -13,7 +13,7 @@ var featuresMsg = message.DeviceFeatures{
 		FeatureDescription: "Clitoral Stimulator",
 		Output: map[string]message.DeviceOutput{
 			"Vibrate": {
-				Value: []int{0, 20},
+				Value: [2]int{0, 20},
 			},
 		},
 	},
@@ -22,7 +22,7 @@ var featuresMsg = message.DeviceFeatures{
 		FeatureDescription: "Insertable Stimulator",
 		Output: map[string]message.DeviceOutput{
 			"Vibrate": {
-				Value: []int{0, 20},
+				Value: [2]int{0, 20},
 			},
 		},
 	},
@@ -31,7 +31,7 @@ var featuresMsg = message.DeviceFeatures{
 		FeatureDescription: "Rotating Head with Directional Control",
 		Output: map[string]message.DeviceOutput{
 			"Vibrate": {
-				Value: []int{-20, 20},
+				Value: [2]int{-20, 20},
 			},
 		},
 	},
@@ -40,7 +40,7 @@ var featuresMsg = message.DeviceFeatures{
 		FeatureDescription: "Battery",
 		Input: map[string]message.DeviceInput{
 			"Battery": {
-				Value:   [2]int32{0, 100},
+				Value:   [2]int{0, 100},
 				Command: []string{"Read"},
 			},
 		},
@@ -51,18 +51,20 @@ func TestRegisterOutputs(t *testing.T) {
 	d := &Device{
 		Name:  "Test Vibrator",
 		Index: 0,
+		Inputs: make(map[uint32]Input),
+		Outputs: make(map[uint32]Output),
 	}
 	err := d.registerOutputs(featuresMsg)
 	assert.NoError(t, err)
 	assert.Len(t, d.Outputs, 3)
-
+	
 	assert.IsType(t, Vibrator{}, d.Outputs[0])
 	assert.Equal(t, uint32(0), d.Outputs[0].Index())
 	assert.Equal(t, "Clitoral Stimulator", d.Outputs[0].Description())
 	assert.Equal(t, VibrateOutput, d.Outputs[0].OutputType())
 	
-	assert.IsType(t, Vibrator{}, d.Outputs[0])
-	assert.Equal(t, uint32(1), d.Outputs[0].Index())
-	assert.Equal(t, "Insertable Stimulator", d.Outputs[0].Description())
-	assert.Equal(t, VibrateOutput, d.Outputs[0].OutputType())
+	assert.IsType(t, Vibrator{}, d.Outputs[1])
+	assert.Equal(t, uint32(1), d.Outputs[1].Index())
+	assert.Equal(t, "Insertable Stimulator", d.Outputs[1].Description())
+	assert.Equal(t, VibrateOutput, d.Outputs[1].OutputType())
 }
