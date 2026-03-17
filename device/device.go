@@ -1,6 +1,9 @@
 package device
 
-import "github.com/CockpitCutie/buttplug-go/message"
+import (
+
+	"github.com/CockpitCutie/buttplug-go/message"
+)
 
 type Device struct {
 	Name             string
@@ -17,6 +20,7 @@ type MessageSender interface {
 }
 
 func FromDeviceList(devlist *message.DeviceList, sender MessageSender) ([]Device, error) {
+	
 	var devices []Device
 	for _, msg := range devlist.Devices {
 		dev, err := newDevice(msg, sender)
@@ -38,11 +42,11 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 		Inputs:           make(map[uint32]Input),
 		Outputs:          make(map[uint32]Output),
 	}
-	err := device.registerOutputs(msg.Features)
+	err := device.registerOutputs(msg.DeviceFeatures)
 	if err != nil {
 		return Device{}, err
 	}
-	err = device.registerInputs(msg.Features)
+	err = device.registerInputs(msg.DeviceFeatures)
 	if err != nil {
 		return Device{}, err
 	}

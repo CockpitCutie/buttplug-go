@@ -186,7 +186,7 @@ func TestDeserializeDeviceList(t *testing.T) {
         "0": {
           "DeviceName": "Test Vibrator",
           "DeviceIndex": 0,
-          "Features": {
+          "DeviceFeatures": {
             "0": {
               "FeatureIndex": 0,
               "FeatureDescription": "Clitoral Stimulator",
@@ -231,7 +231,7 @@ func TestDeserializeDeviceList(t *testing.T) {
           "DeviceIndex": 1,
           "DeviceMessageTimingGap": 100,
           "DeviceDisplayName": "User set name",
-          "Features": {
+          "DeviceFeatures": {
             "0": {
               "FeatureIndex": 0,
               "FeatureDescription": "Stroker",
@@ -276,22 +276,22 @@ func TestDeserializeDeviceList(t *testing.T) {
 			assert.Equal(t, "Test Vibrator", dev0.DeviceName)
 			assert.Equal(t, "", dev0.DeviceDisplayName)
 			assert.Equal(t, uint(0), dev0.DeviceMessageTimingGap)
-			if feat, ok := dev0.Features["0"]; assert.True(t, ok) {
+			if feat, ok := dev0.DeviceFeatures["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{0, 20}}}, feat.Output)
 			}
-			if feat, ok := dev0.Features["1"]; assert.True(t, ok) {
+			if feat, ok := dev0.DeviceFeatures["1"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(1), feat.FeatureIndex)
 				assert.Equal(t, "Insertable Stimulator", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{0, 20}}}, feat.Output)
 			}
-			if feat, ok := dev0.Features["2"]; assert.True(t, ok) {
+			if feat, ok := dev0.DeviceFeatures["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Rotating Head with Directional Control", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{-20, 20}}}, feat.Output)
 			}
-			if feat, ok := dev0.Features["3"]; assert.True(t, ok) {
+			if feat, ok := dev0.DeviceFeatures["3"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(3), feat.FeatureIndex)
 				assert.Equal(t, "Battery", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceInput{"Battery": {Value: [2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
@@ -302,14 +302,14 @@ func TestDeserializeDeviceList(t *testing.T) {
 			assert.Equal(t, "Test Stroker", dev1.DeviceName)
 			assert.Equal(t, "User set name", dev1.DeviceDisplayName)
 			assert.Equal(t, uint(100), dev1.DeviceMessageTimingGap)
-			if feat, ok := dev1.Features["0"]; assert.True(t, ok) {
+			if feat, ok := dev1.DeviceFeatures["0"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(0), feat.FeatureIndex)
 				assert.Equal(t, "Stroker", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{
 					"PositionWithDuration": {Position: []uint{0, 100}, Duration: []uint{0, 100000}},
 					"Position":             {Position: []uint{0, 100}}}, feat.Output)
 			}
-			if feat, ok := dev1.Features["2"]; assert.True(t, ok) {
+			if feat, ok := dev1.DeviceFeatures["2"]; assert.True(t, ok) {
 				assert.Equal(t, uint32(2), feat.FeatureIndex)
 				assert.Equal(t, "Bluetooth Radio RSSI", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceInput{"RSSI": {Value: [2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
