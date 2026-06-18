@@ -10,6 +10,7 @@ import (
 type Output interface {
 	Feature
 	OutputType() OutputType
+	StepRange() [2]int
 }
 
 type OutputType string
@@ -109,6 +110,10 @@ func (v Vibrator) OutputType() OutputType {
 	return VibrateOutput
 }
 
+func (v Vibrator) StepRange() [2]int {
+	return v.stepRange
+}	
+
 func (v Vibrator) Activate(speedStep int) error {
 	stepIsInRange := speedStep == 0 || (speedStep > v.stepRange[0] && speedStep < v.stepRange[1])
 	if !stepIsInRange {
@@ -138,6 +143,10 @@ func (r Rotator) OutputType() OutputType {
 	return RotateOutput
 }
 
+func (r Rotator) StepRange() [2]int {
+	return r.stepRange
+}
+
 func (r Rotator) Activate(speedStep int) error {
 	stepIsInRange := speedStep == 0 || (speedStep > r.stepRange[0] && speedStep < r.stepRange[1])
 	if !stepIsInRange {
@@ -165,6 +174,10 @@ type RotatorWithDirection struct {
 
 func (r RotatorWithDirection) OutputType() OutputType {
 	return RotationWithDirectionOutput
+}
+
+func (r RotatorWithDirection) StepRange() [2]int {
+	return r.stepRange
 }
 
 func (r RotatorWithDirection) Activate(speedStep int, clockwise bool) error {
@@ -198,6 +211,10 @@ func (o Oscillator) OutputType() OutputType {
 	return OscillateOutput
 }
 
+func (o Oscillator) StepRange() [2]int {
+	return o.stepRange
+}
+
 func (o Oscillator) Activate(speedStep int) error {
 	stepIsInRange := speedStep == 0 || (speedStep > o.stepRange[0] && speedStep < o.stepRange[1])
 	if !stepIsInRange {
@@ -221,6 +238,10 @@ type Constrictor struct {
 
 func (c Constrictor) OutputType() OutputType {
 	return ConstrictOutput
+}
+
+func (c Constrictor) StepRange() [2]int {
+	return c.stepRange
 }
 
 func (c Constrictor) Activate(step int) error {
@@ -248,6 +269,10 @@ func (h Heater) OutputType() OutputType {
 	return HeaterOutput
 }
 
+func (h Heater) StepRange() [2]int {
+	return h.stepRange
+}
+
 func (h Heater) Activate(heatLevel int) error {
 	stepIsInRange := heatLevel == 0 || (heatLevel > h.stepRange[0] && heatLevel < h.stepRange[1])
 	if !stepIsInRange {
@@ -271,6 +296,10 @@ type LED struct {
 
 func (l LED) OutputType() OutputType {
 	return LEDOutput
+}
+
+func (l LED) StepRange() [2]int {
+	return l.stepRange
 }
 
 func (l LED) Activate(brightnessStep int) error {
@@ -298,6 +327,10 @@ func (p Position) OutputType() OutputType {
 	return PositionOutput
 }
 
+func (p Position) StepRange() [2]int {
+	return p.stepRange
+}
+
 func (p Position) Activate(positionStep int) error {
 	stepIsInRange := positionStep == 0 || (positionStep > p.stepRange[0] && positionStep < p.stepRange[1])
 	if !stepIsInRange {
@@ -321,6 +354,10 @@ type PositionWithDuration struct {
 
 func (p PositionWithDuration) OutputType() OutputType {
 	return PositionWithDurationOutput
+}
+
+func (p PositionWithDuration) StepRange() [2]int {
+	return p.stepRange
 }
 
 func (p PositionWithDuration) Activate(positionStep int, duration time.Duration) error {
