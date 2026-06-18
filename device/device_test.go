@@ -1,6 +1,7 @@
 package device
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/CockpitCutie/buttplug-go/message"
@@ -51,8 +52,6 @@ func TestRegisterOutputs(t *testing.T) {
 	d := &Device{
 		Name:    "Test Vibrator",
 		Index:   0,
-		Inputs:  make(map[int]Input),
-		Outputs: make(map[int]Output),
 	}
 	err := d.registerOutputs(featuresMsg)
 	assert.NoError(t, err)
@@ -78,8 +77,6 @@ func TestRegisterInputs(t *testing.T) {
 	d := &Device{
 		Name:    "Test Vibrator",
 		Index:   0,
-		Inputs:  make(map[int]Input),
-		Outputs: make(map[int]Output),
 	}
 	err := d.registerInputs(featuresMsg)
 	assert.NoError(t, err)

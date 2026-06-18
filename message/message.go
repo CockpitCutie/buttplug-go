@@ -112,6 +112,5 @@ func Deserialize(b []byte) ([]Message, error) {
 			}
 		}
 	}
-	fmt.Printf("%+v\n", msgs[0])
 	return msgs, nil
 }

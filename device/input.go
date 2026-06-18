@@ -50,7 +50,7 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 			if err != nil {
 				return err
 			}
-			d.Inputs[input.Index()] = input
+			d.Inputs = append(d.Inputs, input)
 		}
 
 	}
@@ -86,14 +86,14 @@ func (d Device) readInput(input Input) (*message.InputReading, error) {
 		Type:         string(input.InputType()),
 		Command:      "Read",
 	}
-	reading, err := d.msgSender.SendRecv(&msg)
+	recv, err := d.msgSender.SendRecv(&msg)
 	if err != nil {
 		return nil, err
 	}
-	if reading, ok := reading.(*message.InputReading); ok {
+	if reading, ok := recv.(*message.InputReading); ok {
 		return reading, nil
 	}
-	return nil, fmt.Errorf("unexpected message type for %s input reading: %T", input.InputType(), reading)
+	return nil, fmt.Errorf("unexpected message type for %s input reading: %T", input.InputType(), recv)
 }
 
 // ----- Battery Input -----
