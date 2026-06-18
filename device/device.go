@@ -79,6 +79,36 @@ func (d Device) Stop() error {
 	return err
 }
 
+// StopInputs stops all input features for the device but leaves outputs unaffected.
+// It returns an error if the stop command fails or if sending a message to the
+// server fails (for example if the connection was dropped).
+func (d Device) StopInputs() error {
+	t := true // to get an address for *bool
+	f := false // to get an address for *bool
+	stopMsg := message.StopCmd{
+		DeviceIndex: d.Index,
+		Inputs: &t,
+		Outputs: &f,
+	}
+	_, err := d.msgSender.SendRecv(&stopMsg)
+	return err
+}
+
+// StopOutputs stops all output features for the device but leaves inputs unaffected.
+// It returns an error if the stop command fails or if sending a message to the
+// server fails (for example if the connection was dropped).
+func (d Device) StopOutputs() error {
+	t := true // to get an address for *bool
+	f := false // to get an address for *bool
+	stopMsg := message.StopCmd{
+		DeviceIndex: d.Index,
+		Inputs: &f,
+		Outputs: &t,
+	}
+	_, err := d.msgSender.SendRecv(&stopMsg)
+	return err
+}
+
 // ----- Output Accessors -----
 
 // Vibrators returns a list of all output features with Vibrate capabilities.
