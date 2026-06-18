@@ -88,6 +88,7 @@ func (w *WebsocketConnector) Disconnect() error {
 	if w.conn == nil {
 		return nil
 	}
+	w.isOpen = false
 	return w.conn.Close()
 }
 
