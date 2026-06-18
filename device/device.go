@@ -1,7 +1,6 @@
 package device
 
 import (
-
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
@@ -20,7 +19,7 @@ type MessageSender interface {
 }
 
 func FromDeviceList(devlist *message.DeviceList, sender MessageSender) ([]Device, error) {
-	
+
 	var devices []Device
 	for _, msg := range devlist.Devices {
 		dev, err := newDevice(msg, sender)
@@ -142,6 +141,46 @@ func (d Device) PositionersWithDuration() []PositionWithDuration {
 		}
 	}
 	return outputs
+}
+
+func (d Device) Batteries() []Battery {
+	var inputs []Battery
+	for _, input := range d.Inputs {
+		if input, ok := input.(Battery); ok {
+			inputs = append(inputs, input)
+		}
+	}
+	return inputs
+}
+
+func (d Device) RSSIs() []RSSI {
+	var inputs []RSSI
+	for _, input := range d.Inputs {
+		if input, ok := input.(RSSI); ok {
+			inputs = append(inputs, input)
+		}
+	}
+	return inputs
+}
+
+func (d Device) Pressures() []Pressure {
+	var inputs []Pressure
+	for _, input := range d.Inputs {
+		if input, ok := input.(Pressure); ok {
+			inputs = append(inputs, input)
+		}
+	}
+	return inputs
+}
+
+func (d Device) Buttons() []Button {
+	var inputs []Button
+	for _, input := range d.Inputs {
+		if input, ok := input.(Button); ok {
+			inputs = append(inputs, input)
+		}
+	}
+	return inputs
 }
 
 type Feature interface {
