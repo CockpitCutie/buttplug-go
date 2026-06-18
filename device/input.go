@@ -46,7 +46,7 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 			continue
 		}
 		for kind, properties := range featureMsg.Input {
-			input, err := makeInput(InputType(kind), properties, feature)
+			input, err := inputFromProps(InputType(kind), properties, feature)
 			if err != nil {
 				return err
 			}
@@ -57,10 +57,10 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 	return nil
 }
 
-// makeInput is a helper function that takes an input type, its properties from a DeviceInput message,
+// inputFromProps is a helper function that takes an input type, its properties from a DeviceInput message,
 // and the parent feature, and returns an instance of the corresponding Input type. It returns an error
 // if the input type is unknown or if the properties are invalid for that input type.
-func makeInput(kind InputType, properties message.DeviceInput, feature feature) (Input, error) {
+func inputFromProps(kind InputType, properties message.DeviceInput, feature feature) (Input, error) {
 	switch kind {
 	case BatteryInput:
 		return Battery{feature: feature}, nil
@@ -75,7 +75,7 @@ func makeInput(kind InputType, properties message.DeviceInput, feature feature) 
 	}
 }
 
-// ReadInput is a helper method on Device that takes an Input and sends a message
+// readInput is a helper method on Device that takes an Input and sends a message
 // to the device to read the current value of that input. It returns the InputReading
 // message received from the device, or an error if the message sending or receiving
 // fails, or the received message is not of the expected type.
