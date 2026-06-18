@@ -320,7 +320,7 @@ func TestDeserializeDeviceList(t *testing.T) {
 	}
 }
 
-func TestDeserializeStopeCmd(t *testing.T) {
+func TestDeserializeStopCmd(t *testing.T) {
 	jsonMessage := `[
   {
     "StopCmd": {

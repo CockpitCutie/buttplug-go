@@ -98,7 +98,6 @@ func (w *WebsocketConnector) Send(msg message.Message) error {
 	}
 	w.msgRecv[msg.ID()] = make(chan message.Message)
 	serialized, err := message.Serialize(msg)
-	println(serialized)
 	if err != nil {
 		return err
 	}
