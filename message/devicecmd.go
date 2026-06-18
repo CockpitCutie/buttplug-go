@@ -1,6 +1,6 @@
 package message
 
-type StopDeviceCmd struct {
+type StopCmd struct {
 	message
 	DeviceIndex int
 	Inputs      *bool

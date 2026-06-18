@@ -320,12 +320,13 @@ func TestDeserializeDeviceList(t *testing.T) {
 	}
 }
 
-func TestDeserializeStopDeviceCmd(t *testing.T) {
+func TestDeserializeStopeCmd(t *testing.T) {
 	jsonMessage := `[
   {
-    "StopDeviceCmd": {
+    "StopCmd": {
       "Id": 1,
       "DeviceIndex": 0,
+      "FeatureIndex": 3,
       "Inputs": true,
       "Outputs": true
     }
@@ -333,7 +334,7 @@ func TestDeserializeStopDeviceCmd(t *testing.T) {
 ]`
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*StopDeviceCmd); ok {
+	if msg, ok := msg[0].(*StopCmd); ok {
 		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equal(t, 0, msg.DeviceIndex)
 		assert.Equal(t, true, *msg.Inputs)

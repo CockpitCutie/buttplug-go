@@ -53,6 +53,17 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 	return device, nil
 }
 
+func (d Device) Stop() error {
+	t := true // to get an address for *bool
+	stopMsg := message.StopCmd{
+		DeviceIndex: d.Index,
+		Inputs: &t,
+		Outputs: &t,
+	}
+	_, err := d.msgSender.SendRecv(&stopMsg)
+	return err
+}
+
 func (d Device) Vibrators() []Vibrator {
 	var outputs []Vibrator
 	for _, output := range d.Outputs {

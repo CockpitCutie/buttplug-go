@@ -88,8 +88,8 @@ func Deserialize(b []byte) ([]Message, error) {
 				var devList DeviceList
 				err = json.Unmarshal(value, &devList)
 				msgs = append(msgs, &devList)
-			case "StopDeviceCmd":
-				var stopDev StopDeviceCmd
+			case "StopCmd":
+				var stopDev StopCmd
 				err = json.Unmarshal(value, &stopDev)
 				msgs = append(msgs, &stopDev)
 			case "StopAllDevices":
@@ -100,6 +100,10 @@ func Deserialize(b []byte) ([]Message, error) {
 				var outputCmd OutputCmd
 				err = json.Unmarshal(value, &outputCmd)
 				msgs = append(msgs, &outputCmd)
+			case "InputReading":
+				var inputReading InputReading
+				err = json.Unmarshal(value, &inputReading)
+				msgs = append(msgs, &inputReading)
 			default:
 				return nil, fmt.Errorf("unknown message type: %s", key)
 			}
