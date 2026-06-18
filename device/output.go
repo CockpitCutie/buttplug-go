@@ -10,10 +10,10 @@ import (
 // Output represents a common interface for device outputs, like Vibrate, Rotate,
 // Oscillate, etc. Each output has a specific type and a range of valid step values
 // that can be used to determine bounds for output intensities.
-// 
+//
 // The Output interface does not provide a common method for activating outputs,
-// as they are not interchangeable, and Activate signatures differ. Instead, 
-// each output type has its own Activate method, and Outputs must be type asserted 
+// as they are not interchangeable, and Activate signatures differ. Instead,
+// each output type has its own Activate method, and Outputs must be type asserted
 // to their concrete type to access it.
 type Output interface {
 	Feature
@@ -36,7 +36,6 @@ const (
 	PositionOutput              OutputType = "Position"
 	PositionWithDurationOutput  OutputType = "PositionWithDuration"
 )
-
 
 // registerOutputs takes a list of device features from a DeviceFeatures message and adds
 // any features with Output capabilities to the device's Outputs map. It returns an error
@@ -113,7 +112,7 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 			stepRange: properties.Value,
 		}, nil
 	default:
-		return nil, fmt.Errorf("unknown device type %s", kind)
+		return nil, fmt.Errorf("unknown output type %s", kind)
 	}
 }
 
@@ -159,8 +158,8 @@ func (v Vibrator) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the vibrator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the vibrator off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the vibrator off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (v Vibrator) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -170,12 +169,12 @@ func (v Vibrator) Activate(step int) error {
 }
 
 // Vibrate sends a message to the device to activate the vibrator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the vibrator off. Vibrate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the vibrator off. Vibrate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
+//
 // Vibrate is a convenience method that calls Activate with the given speed step. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (v Vibrator) Vibrate(speedStep int) error {
 	return v.Activate(speedStep)
@@ -199,8 +198,8 @@ func (r Rotator) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the rotator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the rotator off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the rotator off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (r Rotator) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -210,19 +209,19 @@ func (r Rotator) Activate(step int) error {
 }
 
 // Rotate sends a message to the device to activate the rotator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the rotator off. Rotate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the rotator off. Rotate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
+//
 // Rotate is a convenience method that calls Activate with the given speed step. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (r Rotator) Rotate(speedStep int) error {
 	return r.Activate(speedStep)
 }
 
 // RotatorWithDirection represents a rotating output feature of a device that also
-// has directional control. It provides methods to activate the rotator with a 
+// has directional control. It provides methods to activate the rotator with a
 // specified direction.
 type RotatorWithDirection struct {
 	feature
@@ -242,7 +241,7 @@ func (r RotatorWithDirection) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the rotator with direction at the given
-// step and direction. The step must be between the values returned by StepRange, inclusive, 
+// step and direction. The step must be between the values returned by StepRange, inclusive,
 // or it can be 0 to turn the rotator off. The direction is determined by the clockwise parameter,
 // where true represents clockwise rotation and false represents counterclockwise rotation.
 // Activate returns an error if the step is out of range, or if the message sending or receiving fails.
@@ -257,13 +256,13 @@ func (r RotatorWithDirection) Activate(step int, clockwise bool) error {
 }
 
 // RotateDirection sends a message to the device to activate the rotator with direction at the given
-// step and direction. The step must be between the values returned by StepRange, inclusive, 
+// step and direction. The step must be between the values returned by StepRange, inclusive,
 // or it can be 0 to turn the rotator off. The direction is determined by the clockwise parameter,
 // where true represents clockwise rotation and false represents counterclockwise rotation.
 // RotateDirection returns an error if the step is out of range, or if the message sending or receiving fails.
-// 
+//
 // RotateDirection is a convenience method that calls Activate with the given speed step and direction. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (r RotatorWithDirection) RotateDirection(speedStep int, clockwise bool) error {
 	return r.Activate(speedStep, clockwise)
@@ -287,8 +286,8 @@ func (o Oscillator) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the oscillator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the oscillator off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the oscillator off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (o Oscillator) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -298,12 +297,12 @@ func (o Oscillator) Activate(step int) error {
 }
 
 // Oscillate sends a message to the device to activate the oscillator at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the oscillator off. Oscillate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the oscillator off. Oscillate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
+//
 // Oscillate is a convenience method that calls Activate with the given speed step. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (o Oscillator) Oscillate(speedStep int) error {
 	return o.Activate(speedStep)
@@ -327,8 +326,8 @@ func (c Constrictor) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the constrictor at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the constrictor off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the constrictor off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (c Constrictor) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -338,10 +337,10 @@ func (c Constrictor) Activate(step int) error {
 }
 
 // Constrict sends a message to the device to activate the constrictor at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the constrictor off. Constrict returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the constrictor off. Constrict returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
+//
 // Constrict is a convenience method that calls Activate with the given constriction
 // step. It is provided for readability and to match the common terminology for this
 // type of output, but it does not add any new functionality.
@@ -367,8 +366,8 @@ func (h Heater) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the heater at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the heater off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the heater off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (h Heater) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -378,12 +377,12 @@ func (h Heater) Activate(step int) error {
 }
 
 // Heat sends a message to the device to activate the heater at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the heater off. Heat returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the heater off. Heat returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
+//
 // Heat is a convenience method that calls Activate with the given heat step. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (h Heater) Heat(heatStep int) error {
 	return h.Activate(heatStep)
@@ -406,8 +405,8 @@ func (l LED) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the LED at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the LED off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the LED off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (l LED) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -417,12 +416,12 @@ func (l LED) Activate(step int) error {
 }
 
 // SetBrightness sends a message to the device to activate the LED at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the LED off. SetBrightness returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the LED off. SetBrightness returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
-// SetBrightness is a convenience method that calls Activate with the given 
-// brightness step. It is provided for readability and to match the common 
+//
+// SetBrightness is a convenience method that calls Activate with the given
+// brightness step. It is provided for readability and to match the common
 // terminology for this type of output, but it does not add any new functionality.
 func (l LED) SetBrightness(brightness int) error {
 	return l.Activate(brightness)
@@ -446,8 +445,8 @@ func (p Position) StepRange() [2]int {
 }
 
 // Activate sends a message to the device to activate the position output at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the position output off. Activate returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the position output off. Activate returns an error if the
 // step is out of range, or if the message sending or receiving fails.
 func (p Position) Activate(step int) error {
 	outputValue := message.OutputValue{
@@ -457,12 +456,12 @@ func (p Position) Activate(step int) error {
 }
 
 // MoveTo sends a message to the device to activate the position output at the given
-// step. The step must be between the values returned by StepRange, inclusive, 
-// or it can be 0 to turn the position output off. MoveTo returns an error if the 
+// step. The step must be between the values returned by StepRange, inclusive,
+// or it can be 0 to turn the position output off. MoveTo returns an error if the
 // step is out of range, or if the message sending or receiving fails.
-// 
-// MoveTo is a convenience method that calls Activate with the given position step. 
-// It is provided for readability and to match the common terminology for this type 
+//
+// MoveTo is a convenience method that calls Activate with the given position step.
+// It is provided for readability and to match the common terminology for this type
 // of output, but it does not add any new functionality.
 func (p Position) MoveTo(position int) error {
 	return p.Activate(position)
@@ -481,17 +480,17 @@ func (p PositionWithDuration) OutputType() OutputType {
 	return PositionWithDurationOutput
 }
 
-// StepRange returns the range of valid step values that can be used to activate the 
+// StepRange returns the range of valid step values that can be used to activate the
 // position with duration output.
 func (p PositionWithDuration) StepRange() [2]int {
 	return p.stepRange
 }
 
 // Activate sends a message to the device to activate the position output at the given
-// step for the specified duration. The step must be between the values returned by 
-// StepRange, inclusive, or it can be 0 to turn the position output off. The duration 
-// is specified as a time.Duration, and is converted to milliseconds for the message. 
-// Activate returns an error if the step is out of range, or if the message sending 
+// step for the specified duration. The step must be between the values returned by
+// StepRange, inclusive, or it can be 0 to turn the position output off. The duration
+// is specified as a time.Duration, and is converted to milliseconds for the message.
+// Activate returns an error if the step is out of range, or if the message sending
 // or receiving fails.
 func (p PositionWithDuration) Activate(step int, duration time.Duration) error {
 	durationMillis := int(duration.Milliseconds())
@@ -505,14 +504,14 @@ func (p PositionWithDuration) Activate(step int, duration time.Duration) error {
 }
 
 // MoveToFor sends a message to the device to activate the position output at the given
-// step for the specified duration. The step must be between the values returned by 
-// StepRange, inclusive, or it can be 0 to turn the position output off. The duration 
-// is specified as a time.Duration, and is converted to milliseconds for the message. 
-// MoveToFor returns an error if the step is out of range, or if the message sending 
+// step for the specified duration. The step must be between the values returned by
+// StepRange, inclusive, or it can be 0 to turn the position output off. The duration
+// is specified as a time.Duration, and is converted to milliseconds for the message.
+// MoveToFor returns an error if the step is out of range, or if the message sending
 // or receiving fails.
-// 
+//
 // MoveToFor is a convenience method that calls Activate with the given position step and duration. It is provided
-// for readability and to match the common terminology for this type of output, but it does not 
+// for readability and to match the common terminology for this type of output, but it does not
 // add any new functionality.
 func (p PositionWithDuration) MoveToFor(position int, duration time.Duration) error {
 	return p.Activate(position, duration)
