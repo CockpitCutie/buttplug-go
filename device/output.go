@@ -110,7 +110,15 @@ func (v Vibrator) OutputType() OutputType {
 }
 
 func (v Vibrator) Activate(speedStep uint32) error {
-	return nil
+	msg := message.OutputCmd{
+		DeviceIndex:  v.Device().Index,
+		FeatureIndex: uint(v.Index()),
+		Command: message.OutputValue{
+			"Vibrate": {Value: speedStep},
+		},
+	}
+	_, err := v.device.msgSender.SendRecv(&msg);
+	return err
 }
 
 func (v Vibrator) Vibrate(speedStep uint32) error {
