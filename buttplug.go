@@ -16,7 +16,7 @@ const (
 type Client struct {
 	name       string
 	connector  Connector
-	msg_recv   map[uint32]chan message.Message
+	msg_recv   map[int]chan message.Message
 	serverName string
 }
 
@@ -25,7 +25,7 @@ func New(name string) *Client {
 	return &Client{
 		name:       name,
 		connector:  nil,
-		msg_recv:   make(map[uint32]chan message.Message),
+		msg_recv:   make(map[int]chan message.Message),
 		serverName: "",
 	}
 }

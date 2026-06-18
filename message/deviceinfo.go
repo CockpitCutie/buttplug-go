@@ -7,25 +7,25 @@ type DeviceList struct {
 
 type Device struct {
 	DeviceName             string
-	DeviceIndex            uint
-	DeviceMessageTimingGap uint   `json:",omitempty"`
+	DeviceIndex            int
+	DeviceMessageTimingGap int    `json:",omitempty"`
 	DeviceDisplayName      string `json:",omitempty"`
-	DeviceFeatures               DeviceFeatures
+	DeviceFeatures         DeviceFeatures
 }
 
 type DeviceFeatures map[string]DeviceFeature
 
 type DeviceFeature struct {
 	FeatureDescription string
-	FeatureIndex       uint32
+	FeatureIndex       int
 	Output             map[string]DeviceOutput
 	Input              map[string]DeviceInput
 }
 
 type DeviceOutput struct {
 	Value    [2]int
-	Position []uint
-	Duration []uint
+	Position []int
+	Duration []int
 }
 
 type DeviceInput struct {

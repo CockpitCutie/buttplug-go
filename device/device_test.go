@@ -49,25 +49,25 @@ var featuresMsg = message.DeviceFeatures{
 
 func TestRegisterOutputs(t *testing.T) {
 	d := &Device{
-		Name:  "Test Vibrator",
-		Index: 0,
-		Inputs: make(map[uint32]Input),
-		Outputs: make(map[uint32]Output),
+		Name:    "Test Vibrator",
+		Index:   0,
+		Inputs:  make(map[int]Input),
+		Outputs: make(map[int]Output),
 	}
 	err := d.registerOutputs(featuresMsg)
 	assert.NoError(t, err)
 	assert.Len(t, d.Outputs, 3)
-	
+
 	assert.IsType(t, Vibrator{}, d.Outputs[0])
-	assert.Equal(t, uint32(0), d.Outputs[0].Index())
+	assert.Equal(t, 0, d.Outputs[0].Index())
 	assert.Equal(t, "Clitoral Stimulator", d.Outputs[0].Description())
 	assert.Equal(t, VibrateOutput, d.Outputs[0].OutputType())
-	
+
 	assert.IsType(t, Vibrator{}, d.Outputs[1])
 	assert.Equal(t, uint32(1), d.Outputs[1].Index())
 	assert.Equal(t, "Insertable Stimulator", d.Outputs[1].Description())
 	assert.Equal(t, VibrateOutput, d.Outputs[1].OutputType())
-	
+
 	assert.IsType(t, RotatorWithDirection{}, d.Outputs[2])
 	assert.Equal(t, uint32(2), d.Outputs[2].Index())
 	assert.Equal(t, "Rotating Head with Directional Control", d.Outputs[2].Description())
@@ -76,18 +76,17 @@ func TestRegisterOutputs(t *testing.T) {
 
 func TestRegisterInputs(t *testing.T) {
 	d := &Device{
-		Name:  "Test Vibrator",
-		Index: 0,
-		Inputs: make(map[uint32]Input),
+		Name:    "Test Vibrator",
+		Index:   0,
+		Inputs:  make(map[uint32]Input),
 		Outputs: make(map[uint32]Output),
 	}
 	err := d.registerInputs(featuresMsg)
 	assert.NoError(t, err)
 	assert.Len(t, d.Inputs, 1)
-	
+
 	assert.IsType(t, Battery{}, d.Inputs[3])
 	assert.Equal(t, uint32(3), d.Inputs[3].Index())
 	assert.Equal(t, "Battery", d.Inputs[3].Description())
 	assert.Equal(t, BatteryInput, d.Inputs[3].InputType())
 }
-

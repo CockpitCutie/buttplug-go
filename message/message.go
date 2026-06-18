@@ -7,20 +7,20 @@ import (
 )
 
 type Message interface {
-	ID() uint32
-	SetID(id uint32)
+	ID() int
+	SetID(id int)
 	IsServerEvent() bool
 }
 
 type message struct {
-	Id uint32
+	Id int
 }
 
-func (m message) ID() uint32 {
+func (m message) ID() int {
 	return m.Id
 }
 
-func (m *message) SetID(id uint32) {
+func (m *message) SetID(id int) {
 	m.Id = id
 }
 

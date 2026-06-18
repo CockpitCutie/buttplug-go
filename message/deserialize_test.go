@@ -17,7 +17,7 @@ func TestDeserializeOk(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Ok); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type Ok")
 	}
@@ -36,7 +36,7 @@ func TestDeserializeError(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Error); ok {
-		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 0, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Server received invalid JSON.", msg.Message, "Expected ErrorMessage 'Server received invalid JSON.' found '%s'", msg.Message)
 		assert.Equalf(t, MsgError, msg.Code, "Expected ErrorCode MsgError found %d", msg.Code)
 	} else {
@@ -55,7 +55,7 @@ func TestDeserializePing(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Ping); ok {
-		assert.Equalf(t, uint32(5), msg.ID(), "Expected Id 5 found %d", msg.ID())
+		assert.Equalf(t, 5, msg.ID(), "Expected Id 5 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type Ping")
 	}
@@ -75,10 +75,10 @@ func TestDeserializeRequestServerInfo(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*RequestServerInfo); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Client", msg.ClientName, "Expected ClientName 'Test Client' found '%s'", msg.ClientName)
-		assert.Equalf(t, uint(4), msg.ProtocolVersionMajor, "Expected ProtoMajor 1 found %d", msg.ProtocolVersionMajor)
-		assert.Equalf(t, uint(0), msg.ProtocolVersionMinor, "Expected ProtoMinor 1 found %d", msg.ProtocolVersionMinor)
+		assert.Equalf(t, 4, msg.ProtocolVersionMajor, "Expected ProtoMajor 1 found %d", msg.ProtocolVersionMajor)
+		assert.Equalf(t, 0, msg.ProtocolVersionMinor, "Expected ProtoMinor 1 found %d", msg.ProtocolVersionMinor)
 	} else {
 		t.Errorf("Deserialized message is not of type RequestServerInfo")
 	}
@@ -270,7 +270,7 @@ func TestDeserializeDeviceList(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*DeviceList); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		if dev0, ok := msg.Devices["0"]; assert.True(t, ok) {
 			assert.Equal(t, uint(0), dev0.DeviceIndex)
 			assert.Equal(t, "Test Vibrator", dev0.DeviceName)

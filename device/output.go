@@ -53,47 +53,47 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 	case VibrateOutput:
 		return Vibrator{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case RotateOutput:
 		return Rotator{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case RotationWithDirectionOutput:
 		return RotatorWithDirection{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case OscillateOutput:
 		return Oscillator{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case ConstrictOutput:
 		return Constrictor{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case HeaterOutput:
 		return Heater{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case LEDOutput:
 		return LED{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case PositionOutput:
 		return Position{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	case PositionWithDirectionOutput:
 		return PositionWithDuration{
 			feature:   feature,
-			stepCount: uint32(properties.Value[1]),
+			stepCount: properties.Value[1],
 		}, nil
 	default:
 		return nil, fmt.Errorf("unknown device type %s", kind)
@@ -102,136 +102,136 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 
 type Vibrator struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (v Vibrator) OutputType() OutputType {
 	return VibrateOutput
 }
 
-func (v Vibrator) Activate(speedStep uint32) error {
+func (v Vibrator) Activate(speedStep int) error {
 	msg := message.OutputCmd{
 		DeviceIndex:  v.Device().Index,
-		FeatureIndex: uint(v.Index()),
+		FeatureIndex: v.Index(),
 		Command: message.OutputValue{
 			"Vibrate": {Value: speedStep},
 		},
 	}
-	_, err := v.device.msgSender.SendRecv(&msg);
+	_, err := v.device.msgSender.SendRecv(&msg)
 	return err
 }
 
-func (v Vibrator) Vibrate(speedStep uint32) error {
+func (v Vibrator) Vibrate(speedStep int) error {
 	return v.Activate(speedStep)
 }
 
 type Rotator struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (r Rotator) OutputType() OutputType {
 	return RotateOutput
 }
 
-func (r Rotator) Activate(speedStep uint32) error {
+func (r Rotator) Activate(speedStep int) error {
 	return nil
 }
 
-func (r Rotator) Rotate(speedStep uint32) error {
+func (r Rotator) Rotate(speedStep int) error {
 	return r.Rotate(speedStep)
 }
 
 type RotatorWithDirection struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (r RotatorWithDirection) OutputType() OutputType {
 	return RotationWithDirectionOutput
 }
 
-func (r RotatorWithDirection) Activate(speedStep uint32, clockwise bool) error {
+func (r RotatorWithDirection) Activate(speedStep int, clockwise bool) error {
 	return nil
 }
-func (r RotatorWithDirection) RotateDirection(speedStep uint32, clockwise bool) error {
+func (r RotatorWithDirection) RotateDirection(speedStep int, clockwise bool) error {
 	return r.Activate(speedStep, clockwise)
 }
 
 type Oscillator struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (o Oscillator) OutputType() OutputType {
 	return OscillateOutput
 }
 
-func (o Oscillator) Activate(speedStep uint32) error {
+func (o Oscillator) Activate(speedStep int) error {
 	return nil
 }
 
 type Constrictor struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (c Constrictor) OutputType() OutputType {
 	return ConstrictOutput
 }
 
-func (c Constrictor) Activate(step uint32) error {
+func (c Constrictor) Activate(step int) error {
 	return nil
 }
 
 type Heater struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (h Heater) OutputType() OutputType {
 	return HeaterOutput
 }
 
-func (h Heater) Activate(heatLevel uint32) error {
+func (h Heater) Activate(heatLevel int) error {
 	return nil
 }
 
 type LED struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (l LED) OutputType() OutputType {
 	return LEDOutput
 }
 
-func (l LED) Activate(brightnessStep uint32) error {
+func (l LED) Activate(brightnessStep int) error {
 	return nil
 }
 
 type Position struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (p Position) OutputType() OutputType {
 	return PositionOutput
 }
 
-func (p Position) Activate(positionStep uint32) error {
+func (p Position) Activate(positionStep int) error {
 	return nil
 }
 
 type PositionWithDuration struct {
 	feature
-	stepCount uint32
+	stepCount int
 }
 
 func (p PositionWithDuration) OutputType() OutputType {
 	return PositionWithDirectionOutput
 }
 
-func (p PositionWithDuration) Activate(positionStep uint32, duration time.Time) error {
+func (p PositionWithDuration) Activate(positionStep int, duration time.Time) error {
 	return nil
 }

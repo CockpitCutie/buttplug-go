@@ -6,11 +6,11 @@ import (
 
 type Device struct {
 	Name             string
-	Index            uint
-	MessageTimingGap uint
+	Index            int
+	MessageTimingGap int
 	DisplayName      string
-	Inputs           map[uint32]Input
-	Outputs          map[uint32]Output
+	Inputs           map[int]Input
+	Outputs          map[int]Output
 	msgSender        MessageSender
 }
 
@@ -38,8 +38,8 @@ func newDevice(msg message.Device, msgSender MessageSender) (Device, error) {
 		MessageTimingGap: msg.DeviceMessageTimingGap,
 		DisplayName:      msg.DeviceDisplayName,
 		msgSender:        msgSender,
-		Inputs:           make(map[uint32]Input),
-		Outputs:          make(map[uint32]Output),
+		Inputs:           make(map[int]Input),
+		Outputs:          make(map[int]Output),
 	}
 	err := device.registerOutputs(msg.DeviceFeatures)
 	if err != nil {
@@ -185,13 +185,13 @@ func (d Device) Buttons() []Button {
 
 type Feature interface {
 	Description() string
-	Index() uint32
+	Index() int
 	Device() *Device
 }
 
 type feature struct {
 	description string
-	index       uint32
+	index       int
 	device      *Device
 }
 
@@ -199,7 +199,7 @@ func (f feature) Description() string {
 	return f.description
 }
 
-func (f feature) Index() uint32 {
+func (f feature) Index() int {
 	return f.index
 }
 

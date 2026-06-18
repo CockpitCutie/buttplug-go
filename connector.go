@@ -9,7 +9,7 @@ import (
 )
 
 type Connector interface {
-	Connect(msgRecv map[uint32]chan message.Message) error
+	Connect(msgRecv map[int]chan message.Message) error
 	Connected() bool
 	Disconnect() error
 	Send(msg message.Message) error
@@ -20,8 +20,8 @@ type WebsocketConnector struct {
 	url       string
 	isOpen    bool
 	conn      *websocket.Conn
-	msgRecv   map[uint32]chan message.Message
-	idCounter uint32
+	msgRecv   map[int]chan message.Message
+	idCounter int
 }
 
 func NewWsConnector(url string) *WebsocketConnector {
@@ -34,7 +34,7 @@ func NewWsConnector(url string) *WebsocketConnector {
 	}
 }
 
-func (w *WebsocketConnector) Connect(msgRecv map[uint32]chan message.Message) error {
+func (w *WebsocketConnector) Connect(msgRecv map[int]chan message.Message) error {
 	w.msgRecv = msgRecv
 	conn, _, err := websocket.DefaultDialer.Dial(w.url, http.Header{})
 	if err != nil {
@@ -113,7 +113,7 @@ func (w *WebsocketConnector) SendRecv(m message.Message) (message.Message, error
 	return w.recv(m.ID())
 }
 
-func (w *WebsocketConnector) recv(id uint32) (message.Message, error) {
+func (w *WebsocketConnector) recv(id int) (message.Message, error) {
 	msg := <-w.msgRecv[id]
 	if err, ok := msg.(*message.Error); ok {
 		return err, err.Error()
@@ -122,7 +122,7 @@ func (w *WebsocketConnector) recv(id uint32) (message.Message, error) {
 	return msg, nil
 }
 
-func (w *WebsocketConnector) nextID() uint32 {
+func (w *WebsocketConnector) nextID() int {
 	id := w.idCounter
 	w.idCounter++
 	return id
