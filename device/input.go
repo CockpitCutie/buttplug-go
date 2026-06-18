@@ -6,12 +6,21 @@ import (
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
+// Input represents a common interface for device inputs, like Buttons, Battery,
+// RSSI, and Pressures. 
+// 
+// The Input interface does not provide a common method for reading from inputs,
+// as they all have different return types. Instead, each input type has its own 
+// Read method, and Inputs must be type asserted to their specific type to access 
+// it.
 type Input interface {
 	Feature
 	InputType() InputType
 	ReadRange() [2]int
 }
 
+// InputType represents the type of an input feature, such as Battery, RSSI, Pressure,
+// or Button. This list of input types is taken from the ButtplugIO v4 specification.
 type InputType string
 
 const (
@@ -21,6 +30,9 @@ const (
 	ButtonInput   InputType = "Button"
 )
 
+// registerInputs takes a list of device features from a DeviceFeatures message and adds
+// any features with input capabilities to the device's Inputs map. It returns an error
+// if any of the input features have an unknown type or invalid properties.
 func (d *Device) registerInputs(features message.DeviceFeatures) error {
 	for _, featureMsg := range features {
 		feature := feature{
@@ -43,6 +55,9 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 	return nil
 }
 
+// makeInput is a helper function that takes an input type, its properties from a DeviceInput message,
+// and the parent feature, and returns an instance of the corresponding Input type. It returns an error
+// if the input type is unknown or if the properties are invalid for that input type.
 func makeInput(kind InputType, properties message.DeviceInput, feature feature) (Input, error) {
 	switch kind {
 	case BatteryInput:
@@ -58,76 +73,119 @@ func makeInput(kind InputType, properties message.DeviceInput, feature feature) 
 	}
 }
 
+// Battery represents a battery level input feature of a device. It provides methods
+// to read the battery level as a percentage.
 type Battery struct {
 	feature
 }
 
+// InputType returns the type of the input, which is always BatteryInput ("Battery").
 func (b Battery) InputType() InputType {
 	return BatteryInput
 }
 
+// ReadRange returns the range of valid values that the input can return. For Battery 
+// inputs, this is always [0, 100], representing a percentage.
 func (b Battery) ReadRange() [2]int {
 	return [2]int{0, 100}
 }
 
-func (b Battery) Read() uint8 {
-	return 0 // TODO
+// Read returns the current battery level as a percentage. The value is between 0 
+// and 100, inclusive.
+func (b Battery) Read() (int, error) {
+	return 0, nil // TODO
 }
 
-func (b Battery) Percentage() uint8 {
+// Convienience method for Read, to make it more clear that this accesses battery
+// level as a percentage.
+func (b Battery) Percentage() (int, error) {
 	return b.Read()
 }
 
+// RSSI represents a signal strength input feature of a device. It provides methods
+// to read the current signal strength level.
 type RSSI struct {
 	feature
 	readRange [2]int
 }
 
+// InputType returns the type of the input, which is always RSSIInput ("RSSI").
 func (r RSSI) InputType() InputType {
 	return RSSIInput
 }
 
+// ReadRange returns the range of valid values that the input can return. The specific
+// range of values can vary between devices, but the result is always negative, and
+// usually between -10 and -100, where values closer to 0 represent stronger signals.
 func (r RSSI) ReadRange() [2]int {
 	return r.readRange
 }
 
-func (r RSSI) Read() int8 {
-	return 0 // TODO
+// Read returns the current signal strength level. The value is between the minimum and
+// maximum values specified in the ReadRange.
+func (r RSSI) Read() (int, error) {
+	return 0, nil // TODO
 }
 
+// Pressure represents a pressure level input feature of a device. It provides methods
+// to read the current pressure level.
 type Pressure struct {
 	feature
 	readRange [2]int
 }
 
+// InputType returns the type of the input, which is always PressureInput ("Pressure").
 func (p Pressure) InputType() InputType {
 	return PressureInput
 }
 
+// ReadRange returns the range of valid values that the input can return. The specific
+// range of values for pressure inputs can vary widely between devices, and there is 
+// no standardized unit or scale for pressure levels.
 func (p Pressure) ReadRange() [2]int {
 	return p.readRange
 }
 
-func (p Pressure) Read() uint {
-	return 0 // TODO
+// Read returns the current pressure level. The value is between the minimum and 
+// maximum values specified in the ReadRange.
+// 
+// IMPORTANT: there is no standardized level between manufacturers for pressure 
+// inputs, so the values returned by this method may not be consistent across 
+// different devices. Calibration and unit interpretation must be handled at 
+// the application level.
+func (p Pressure) Read() (int, error) {
+	return 0, nil // TODO
 }
 
+// Button represents a button input feature of a device. It provides methods to read
+// the current state of the button (pressed or not pressed).
 type Button struct {
 	feature
 }
 
+// InputType returns the type of the input, which is always ButtonInput ("Button").
 func (b Button) InputType() InputType {
 	return ButtonInput
 }
 
+// ReadRange returns the range of valid values that the input can return. For Button
+// inputs,this is always [0, 1], where 0 represents not pressed and 1 represents pressed.
 func (b Button) ReadRange() [2]int {
 	return [2]int{0, 1}
 }
 
-func (b Button) Read() uint8 {
-	return 0
+// Read returns the current state of the button, where 0 represents not pressed 
+// and 1 represents pressed.
+func (b Button) Read() (int, error) {
+	return 0, nil
 }
 
+// IsPressed returns true if the button is currently pressed, and false otherwise.
+// If there is an error reading the button state, it returns false by default.
 func (b Button) IsPressed() bool {
-	return b.Read() == 1
+	data, err := b.Read()
+	if err != nil {
+		return false
+	}
+	return data == 1
 }
