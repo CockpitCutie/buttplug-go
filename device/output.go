@@ -49,6 +49,25 @@ func (d *Device) registerOutputs(features message.DeviceFeatures) error {
 	return nil
 }
 
+func (d *Device) activateOutput(output Output, value message.OutputValue) error {
+	outputValue, ok := value[string(output.OutputType())]
+	if !ok {
+		return fmt.Errorf("output value for type %s not found", output.OutputType())
+	}
+	step := outputValue.Value
+	stepIsInRange := step == 0 || (step >= output.StepRange()[0] && step <= output.StepRange()[1])
+	if !stepIsInRange {
+		return fmt.Errorf("step %d is out of range for this %s", step, output.OutputType())
+	}
+	msg := message.OutputCmd{
+		DeviceIndex:  d.Index,
+		FeatureIndex: output.Index(),
+		Command:      value,
+	}
+	_, err := d.msgSender.SendRecv(&msg)
+	return err
+}
+
 func outputFromProps(kind OutputType, properties message.DeviceOutput, feature feature) (Output, error) {
 	switch kind {
 	case VibrateOutput:
@@ -112,22 +131,13 @@ func (v Vibrator) OutputType() OutputType {
 
 func (v Vibrator) StepRange() [2]int {
 	return v.stepRange
-}	
+}
 
-func (v Vibrator) Activate(speedStep int) error {
-	stepIsInRange := speedStep == 0 || (speedStep > v.stepRange[0] && speedStep < v.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("speed step %d is out of range for this vibrator", speedStep)
+func (v Vibrator) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(v.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  v.Device().Index,
-		FeatureIndex: v.Index(),
-		Command: message.OutputValue{
-			"Vibrate": {Value: speedStep},
-		},
-	}
-	_, err := v.device.msgSender.SendRecv(&msg)
-	return err
+	return v.device.activateOutput(v, outputValue)
 }
 
 func (v Vibrator) Vibrate(speedStep int) error {
@@ -147,24 +157,15 @@ func (r Rotator) StepRange() [2]int {
 	return r.stepRange
 }
 
-func (r Rotator) Activate(speedStep int) error {
-	stepIsInRange := speedStep == 0 || (speedStep > r.stepRange[0] && speedStep < r.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("speed step %d is out of range for this vibrator", speedStep)
+func (r Rotator) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(r.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  r.Device().Index,
-		FeatureIndex: r.Index(),
-		Command: message.OutputValue{
-			"Vibrate": {Value: speedStep},
-		},
-	}
-	_, err := r.device.msgSender.SendRecv(&msg)
-	return err
+	return r.device.activateOutput(r, outputValue)
 }
 
 func (r Rotator) Rotate(speedStep int) error {
-	return r.Rotate(speedStep)
+	return r.Activate(speedStep)
 }
 
 type RotatorWithDirection struct {
@@ -180,23 +181,14 @@ func (r RotatorWithDirection) StepRange() [2]int {
 	return r.stepRange
 }
 
-func (r RotatorWithDirection) Activate(speedStep int, clockwise bool) error {
-	stepIsInRange := speedStep == 0 || (speedStep > r.stepRange[0] && speedStep < r.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("speed step %d is out of range for this vibrator", speedStep)
-	}
-	msg := message.OutputCmd{
-		DeviceIndex:  r.Device().Index,
-		FeatureIndex: r.Index(),
-		Command: message.OutputValue{
-			"RotationWithDirection": {
-				Value:     speedStep,
-				Clockwise: &clockwise,
-			},
+func (r RotatorWithDirection) Activate(step int, clockwise bool) error {
+	outputValue := message.OutputValue{
+		string(r.OutputType()): {
+			Value:     step,
+			Clockwise: &clockwise,
 		},
 	}
-	_, err := r.device.msgSender.SendRecv(&msg)
-	return err
+	return r.device.activateOutput(r, outputValue)
 }
 func (r RotatorWithDirection) RotateDirection(speedStep int, clockwise bool) error {
 	return r.Activate(speedStep, clockwise)
@@ -215,20 +207,11 @@ func (o Oscillator) StepRange() [2]int {
 	return o.stepRange
 }
 
-func (o Oscillator) Activate(speedStep int) error {
-	stepIsInRange := speedStep == 0 || (speedStep > o.stepRange[0] && speedStep < o.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("speed step %d is out of range for this vibrator", speedStep)
+func (o Oscillator) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(o.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  o.Device().Index,
-		FeatureIndex: o.Index(),
-		Command: message.OutputValue{
-			"Oscillate": {Value: speedStep},
-		},
-	}
-	_, err := o.device.msgSender.SendRecv(&msg)
-	return err
+	return o.device.activateOutput(o, outputValue)
 }
 
 type Constrictor struct {
@@ -245,19 +228,10 @@ func (c Constrictor) StepRange() [2]int {
 }
 
 func (c Constrictor) Activate(step int) error {
-	stepIsInRange := step == 0 || (step > c.stepRange[0] && step < c.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("step %d is out of range for this constrictor", step)
+	outputValue := message.OutputValue{
+		string(c.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  c.Device().Index,
-		FeatureIndex: c.Index(),
-		Command: message.OutputValue{
-			"Constrict": {Value: step},
-		},
-	}
-	_, err := c.device.msgSender.SendRecv(&msg)
-	return err
+	return c.device.activateOutput(c, outputValue)
 }
 
 type Heater struct {
@@ -273,20 +247,11 @@ func (h Heater) StepRange() [2]int {
 	return h.stepRange
 }
 
-func (h Heater) Activate(heatLevel int) error {
-	stepIsInRange := heatLevel == 0 || (heatLevel > h.stepRange[0] && heatLevel < h.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("heat level %d is out of range for this heater", heatLevel)
+func (h Heater) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(h.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  h.Device().Index,
-		FeatureIndex: h.Index(),
-		Command: message.OutputValue{
-			"Heat": {Value: heatLevel},
-		},
-	}
-	_, err := h.device.msgSender.SendRecv(&msg)
-	return err
+	return h.device.activateOutput(h, outputValue)
 }
 
 type LED struct {
@@ -302,20 +267,11 @@ func (l LED) StepRange() [2]int {
 	return l.stepRange
 }
 
-func (l LED) Activate(brightnessStep int) error {
-	stepIsInRange := brightnessStep == 0 || (brightnessStep > l.stepRange[0] && brightnessStep < l.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("brightness step %d is out of range for this LED", brightnessStep)
+func (l LED) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(l.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  l.Device().Index,
-		FeatureIndex: l.Index(),
-		Command: message.OutputValue{
-			"LED": {Value: brightnessStep},
-		},
-	}
-	_, err := l.device.msgSender.SendRecv(&msg)
-	return err
+	return l.device.activateOutput(l, outputValue)
 }
 
 type Position struct {
@@ -331,20 +287,11 @@ func (p Position) StepRange() [2]int {
 	return p.stepRange
 }
 
-func (p Position) Activate(positionStep int) error {
-	stepIsInRange := positionStep == 0 || (positionStep > p.stepRange[0] && positionStep < p.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("position step %d is out of range for this position output", positionStep)
+func (p Position) Activate(step int) error {
+	outputValue := message.OutputValue{
+		string(p.OutputType()): {Value: step},
 	}
-	msg := message.OutputCmd{
-		DeviceIndex:  p.Device().Index,
-		FeatureIndex: p.Index(),
-		Command: message.OutputValue{
-			"Position": {Value: positionStep},
-		},
-	}
-	_, err := p.device.msgSender.SendRecv(&msg)
-	return err
+	return p.device.activateOutput(p, outputValue)
 }
 
 type PositionWithDuration struct {
@@ -360,22 +307,13 @@ func (p PositionWithDuration) StepRange() [2]int {
 	return p.stepRange
 }
 
-func (p PositionWithDuration) Activate(positionStep int, duration time.Duration) error {
-	stepIsInRange := positionStep == 0 || (positionStep > p.stepRange[0] && positionStep < p.stepRange[1])
-	if !stepIsInRange {
-		return fmt.Errorf("position step %d is out of range for this position output", positionStep)
-	}
+func (p PositionWithDuration) Activate(step int, duration time.Duration) error {
 	durationMillis := int(duration.Milliseconds())
-	msg := message.OutputCmd{
-		DeviceIndex:  p.Device().Index,
-		FeatureIndex: p.Index(),
-		Command: message.OutputValue{
-			"PositionWithDuration": {
-				Value:    positionStep,
-				Duration: &durationMillis,
-			},
+	outputValue := message.OutputValue{
+		string(p.OutputType()): {
+			Value:    step,
+			Duration: &durationMillis,
 		},
 	}
-	_, err := p.device.msgSender.SendRecv(&msg)
-	return err
+	return p.device.activateOutput(p, outputValue)
 }
