@@ -64,12 +64,12 @@ func TestRegisterOutputs(t *testing.T) {
 	assert.Equal(t, VibrateOutput, d.Outputs[0].OutputType())
 
 	assert.IsType(t, Vibrator{}, d.Outputs[1])
-	assert.Equal(t, uint32(1), d.Outputs[1].Index())
+	assert.Equal(t, 1, d.Outputs[1].Index())
 	assert.Equal(t, "Insertable Stimulator", d.Outputs[1].Description())
 	assert.Equal(t, VibrateOutput, d.Outputs[1].OutputType())
 
 	assert.IsType(t, RotatorWithDirection{}, d.Outputs[2])
-	assert.Equal(t, uint32(2), d.Outputs[2].Index())
+	assert.Equal(t, 2, d.Outputs[2].Index())
 	assert.Equal(t, "Rotating Head with Directional Control", d.Outputs[2].Description())
 	assert.Equal(t, RotationWithDirectionOutput, d.Outputs[2].OutputType())
 }
@@ -78,15 +78,15 @@ func TestRegisterInputs(t *testing.T) {
 	d := &Device{
 		Name:    "Test Vibrator",
 		Index:   0,
-		Inputs:  make(map[uint32]Input),
-		Outputs: make(map[uint32]Output),
+		Inputs:  make(map[int]Input),
+		Outputs: make(map[int]Output),
 	}
 	err := d.registerInputs(featuresMsg)
 	assert.NoError(t, err)
 	assert.Len(t, d.Inputs, 1)
 
 	assert.IsType(t, Battery{}, d.Inputs[3])
-	assert.Equal(t, uint32(3), d.Inputs[3].Index())
+	assert.Equal(t, 3, d.Inputs[3].Index())
 	assert.Equal(t, "Battery", d.Inputs[3].Description())
 	assert.Equal(t, BatteryInput, d.Inputs[3].InputType())
 }

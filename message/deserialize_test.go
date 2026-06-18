@@ -99,11 +99,11 @@ func TestServerInfo(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*ServerInfo); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equalf(t, "Test Server", msg.ServerName, "Expected ServerName 'Test Server' found '%s'", msg.ServerName)
-		assert.Equalf(t, uint(100), msg.MaxPingTime, "Expected MaxPingTime 100 found %d", msg.MaxPingTime)
-		assert.Equalf(t, uint(4), msg.ProtocolVersionMajor, "Expected ProtoMajor 4 found %d", msg.ProtocolVersionMajor)
-		assert.Equalf(t, uint(0), msg.ProtocolVersionMinor, "Expected ProtoMinor 0 found %d", msg.ProtocolVersionMinor)
+		assert.Equalf(t, 100, msg.MaxPingTime, "Expected MaxPingTime 100 found %d", msg.MaxPingTime)
+		assert.Equalf(t, 4, msg.ProtocolVersionMajor, "Expected ProtoMajor 4 found %d", msg.ProtocolVersionMajor)
+		assert.Equalf(t, 0, msg.ProtocolVersionMinor, "Expected ProtoMinor 0 found %d", msg.ProtocolVersionMinor)
 	} else {
 		t.Errorf("Deserialized message is not of type ServerInfo")
 	}
@@ -120,7 +120,7 @@ func TestDeserializeStartScanning(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*StartScanning); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type StartScanning")
 	}
@@ -137,7 +137,7 @@ func TestDeserializeStopScanning(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*StopScanning); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type StopScanning")
 	}
@@ -154,7 +154,7 @@ func TestDeserializeScanningFinished(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*ScanningFinished); ok {
-		assert.Equalf(t, uint32(0), msg.ID(), "Expected Id 0 found %d", msg.ID())
+		assert.Equalf(t, 0, msg.ID(), "Expected Id 0 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type ScanningFinished")
 	}
@@ -171,7 +171,7 @@ func TestDeserializeRequestDeviceList(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*RequestDeviceList); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 	} else {
 		t.Errorf("Deserialized message is not of type RequestDeviceList")
 	}
@@ -272,45 +272,45 @@ func TestDeserializeDeviceList(t *testing.T) {
 	if msg, ok := msg[0].(*DeviceList); ok {
 		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		if dev0, ok := msg.Devices["0"]; assert.True(t, ok) {
-			assert.Equal(t, uint(0), dev0.DeviceIndex)
+			assert.Equal(t, 0, dev0.DeviceIndex)
 			assert.Equal(t, "Test Vibrator", dev0.DeviceName)
 			assert.Equal(t, "", dev0.DeviceDisplayName)
-			assert.Equal(t, uint(0), dev0.DeviceMessageTimingGap)
+			assert.Equal(t, 0, dev0.DeviceMessageTimingGap)
 			if feat, ok := dev0.DeviceFeatures["0"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(0), feat.FeatureIndex)
+				assert.Equal(t, 0, feat.FeatureIndex)
 				assert.Equal(t, "Clitoral Stimulator", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.DeviceFeatures["1"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(1), feat.FeatureIndex)
+				assert.Equal(t, 1, feat.FeatureIndex)
 				assert.Equal(t, "Insertable Stimulator", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{0, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.DeviceFeatures["2"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(2), feat.FeatureIndex)
+				assert.Equal(t, 2, feat.FeatureIndex)
 				assert.Equal(t, "Rotating Head with Directional Control", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{"Vibrate": {Value: [2]int{-20, 20}}}, feat.Output)
 			}
 			if feat, ok := dev0.DeviceFeatures["3"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(3), feat.FeatureIndex)
+				assert.Equal(t, 3, feat.FeatureIndex)
 				assert.Equal(t, "Battery", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceInput{"Battery": {Value: [2]int{0, 100}, Command: []string{"Read"}}}, feat.Input)
 			}
 		}
 		if dev1, ok := msg.Devices["1"]; assert.True(t, ok) {
-			assert.Equal(t, uint(1), dev1.DeviceIndex)
+			assert.Equal(t, 1, dev1.DeviceIndex)
 			assert.Equal(t, "Test Stroker", dev1.DeviceName)
 			assert.Equal(t, "User set name", dev1.DeviceDisplayName)
-			assert.Equal(t, uint(100), dev1.DeviceMessageTimingGap)
+			assert.Equal(t, 100, dev1.DeviceMessageTimingGap)
 			if feat, ok := dev1.DeviceFeatures["0"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(0), feat.FeatureIndex)
+				assert.Equal(t, 0, feat.FeatureIndex)
 				assert.Equal(t, "Stroker", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceOutput{
-					"PositionWithDuration": {Position: []uint{0, 100}, Duration: []uint{0, 100000}},
-					"Position":             {Position: []uint{0, 100}}}, feat.Output)
+					"PositionWithDuration": {Position: []int{0, 100}, Duration: []int{0, 100000}},
+					"Position":             {Position: []int{0, 100}}}, feat.Output)
 			}
 			if feat, ok := dev1.DeviceFeatures["2"]; assert.True(t, ok) {
-				assert.Equal(t, uint32(2), feat.FeatureIndex)
+				assert.Equal(t, 2, feat.FeatureIndex)
 				assert.Equal(t, "Bluetooth Radio RSSI", feat.FeatureDescription)
 				assert.Equal(t, map[string]DeviceInput{"RSSI": {Value: [2]int{-10, -100}, Command: []string{"Read"}}}, feat.Input)
 			}
@@ -334,8 +334,8 @@ func TestDeserializeStopDeviceCmd(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*StopDeviceCmd); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
-		assert.Equal(t, uint(0), msg.DeviceIndex)
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equal(t, 0, msg.DeviceIndex)
 		assert.Equal(t, true, *msg.Inputs)
 		assert.Equal(t, true, *msg.Outputs)
 	} else {
@@ -356,7 +356,7 @@ func TestDeserializeStopAllDevices(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*StopAllDevices); ok {
-		assert.Equalf(t, uint32(1), msg.ID(), "Expected Id 1 found %d", msg.ID())
+		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
 		assert.Equal(t, true, *msg.Inputs)
 		assert.Equal(t, true, *msg.Outputs)
 	} else {
@@ -380,10 +380,10 @@ func TestDeserializeOutputCmdVibrate(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
 	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
-		assert.Equal(t, uint32(1), msg.Id)
-		assert.Equal(t, uint(0), msg.DeviceIndex)
-		assert.Equal(t, uint(0), msg.FeatureIndex)
-		assert.Equal(t, uint32(10), msg.Command["Vibrate"].Value)
+		assert.Equal(t, 1, msg.Id)
+		assert.Equal(t, 0, msg.DeviceIndex)
+		assert.Equal(t, 0, msg.FeatureIndex)
+		assert.Equal(t, 10, msg.Command["Vibrate"].Value)
 	} else {
 		t.Errorf("Deserialized message is not of type OutputCmd")
 	}
@@ -406,10 +406,10 @@ func TestDeserializeOutputCmdRotationWithDirection(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
 	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
-		assert.Equal(t, uint32(1), msg.Id)
-		assert.Equal(t, uint(0), msg.DeviceIndex)
-		assert.Equal(t, uint(0), msg.FeatureIndex)
-		assert.Equal(t, uint32(10), msg.Command["RotateWithDirection"].Value)
+		assert.Equal(t, 1, msg.Id)
+		assert.Equal(t, 0, msg.DeviceIndex)
+		assert.Equal(t, 0, msg.FeatureIndex)
+		assert.Equal(t, 10, msg.Command["RotateWithDirection"].Value)
 		assert.False(t, *msg.Command["RotateWithDirection"].Clockwise)
 	} else {
 		t.Errorf("Deserialized message is not of type OutputCmd")
@@ -433,11 +433,11 @@ func TestDeserializeOutputCmdPositionWithDuration(t *testing.T) {
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoError(t, err)
 	if msg, ok := msg[0].(*OutputCmd); assert.True(t, ok) {
-		assert.Equal(t, uint32(1), msg.Id)
-		assert.Equal(t, uint(0), msg.DeviceIndex)
-		assert.Equal(t, uint(0), msg.FeatureIndex)
-		assert.Equal(t, uint32(85), msg.Command["PositionWithDuration"].Value)
-		assert.Equal(t, uint32(15), *msg.Command["PositionWithDuration"].Duration)
+		assert.Equal(t, 1, msg.Id)
+		assert.Equal(t, 0, msg.DeviceIndex)
+		assert.Equal(t, 0, msg.FeatureIndex)
+		assert.Equal(t, 85, msg.Command["PositionWithDuration"].Value)
+		assert.Equal(t, 15, *msg.Command["PositionWithDuration"].Duration)
 	} else {
 		t.Errorf("Deserialized message is not of type OutputCmd")
 	}
