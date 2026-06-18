@@ -7,11 +7,11 @@ import (
 )
 
 // Input represents a common interface for device inputs, like Buttons, Battery,
-// RSSI, and Pressures. 
-// 
+// RSSI, and Pressures.
+//
 // The Input interface does not provide a common method for reading from inputs,
-// as they all have different return types. Instead, each input type has its own 
-// Read method, and Inputs must be type asserted to their specific type to access 
+// as they all have different return types. Instead, each input type has its own
+// Read method, and Inputs must be type asserted to their specific type to access
 // it.
 type Input interface {
 	Feature
@@ -84,19 +84,36 @@ func (b Battery) InputType() InputType {
 	return BatteryInput
 }
 
-// ReadRange returns the range of valid values that the input can return. For Battery 
+// ReadRange returns the range of valid values that the input can return. For Battery
 // inputs, this is always [0, 100], representing a percentage.
 func (b Battery) ReadRange() [2]int {
 	return [2]int{0, 100}
 }
 
-// Read returns the current battery level as a percentage. The value is between 0 
+// Read returns the current battery level as a percentage. The value is between 0
 // and 100, inclusive.
 func (b Battery) Read() (int, error) {
-	return 0, nil // TODO
+	msg := message.InputCmd{
+		DeviceIndex:  b.Device().Index,
+		FeatureIndex: b.Index(),
+		Type:         string(b.InputType()),
+		Command:      "Read",
+	}
+	reading, err := b.device.msgSender.SendRecv(&msg)
+	if err != nil {
+		return 0, err
+	}
+	if reading, ok := reading.(*message.InputReading); ok {
+		if reading.Reading.Battery != nil {
+			return reading.Reading.Battery.Value, nil
+		}
+		return 0, fmt.Errorf("unexpected input reading type for battery input: %v", reading.Reading)
+	}
+	return 0, fmt.Errorf("unexpected message type for battery input reading: %T", reading)
+
 }
 
-// Convienience method for Read, to make it more clear that this accesses battery
+// Convenience method for Read, to make it more clear that this accesses battery
 // level as a percentage.
 func (b Battery) Percentage() (int, error) {
 	return b.Read()
@@ -124,7 +141,23 @@ func (r RSSI) ReadRange() [2]int {
 // Read returns the current signal strength level. The value is between the minimum and
 // maximum values specified in the ReadRange.
 func (r RSSI) Read() (int, error) {
-	return 0, nil // TODO
+	msg := message.InputCmd{
+		DeviceIndex:  r.Device().Index,
+		FeatureIndex: r.Index(),
+		Type:         string(r.InputType()),
+		Command:      "Read",
+	}
+	reading, err := r.device.msgSender.SendRecv(&msg)
+	if err != nil {
+		return 0, err
+	}
+	if reading, ok := reading.(*message.InputReading); ok {
+		if reading.Reading.RSSI != nil {
+			return reading.Reading.RSSI.Value, nil
+		}
+		return 0, fmt.Errorf("unexpected input reading type for RSSI input: %v", reading.Reading)
+	}
+	return 0, fmt.Errorf("unexpected message type for RSSI input reading: %T", reading)
 }
 
 // Pressure represents a pressure level input feature of a device. It provides methods
@@ -140,21 +173,37 @@ func (p Pressure) InputType() InputType {
 }
 
 // ReadRange returns the range of valid values that the input can return. The specific
-// range of values for pressure inputs can vary widely between devices, and there is 
+// range of values for pressure inputs can vary widely between devices, and there is
 // no standardized unit or scale for pressure levels.
 func (p Pressure) ReadRange() [2]int {
 	return p.readRange
 }
 
-// Read returns the current pressure level. The value is between the minimum and 
+// Read returns the current pressure level. The value is between the minimum and
 // maximum values specified in the ReadRange.
-// 
-// IMPORTANT: there is no standardized level between manufacturers for pressure 
-// inputs, so the values returned by this method may not be consistent across 
-// different devices. Calibration and unit interpretation must be handled at 
+//
+// IMPORTANT: there is no standardized level between manufacturers for pressure
+// inputs, so the values returned by this method may not be consistent across
+// different devices. Calibration and unit interpretation must be handled at
 // the application level.
 func (p Pressure) Read() (int, error) {
-	return 0, nil // TODO
+	msg := message.InputCmd{
+		DeviceIndex:  p.Device().Index,
+		FeatureIndex: p.Index(),
+		Type:         string(p.InputType()),
+		Command:      "Read",
+	}
+	reading, err := p.device.msgSender.SendRecv(&msg)
+	if err != nil {
+		return 0, err
+	}
+	if reading, ok := reading.(*message.InputReading); ok {
+		if reading.Reading.Pressure != nil {
+			return reading.Reading.Pressure.Value, nil
+		}
+		return 0, fmt.Errorf("unexpected input reading type for pressure input: %v", reading.Reading)
+	}
+	return 0, fmt.Errorf("unexpected message type for pressure input reading: %T", reading)
 }
 
 // Button represents a button input feature of a device. It provides methods to read
@@ -169,15 +218,31 @@ func (b Button) InputType() InputType {
 }
 
 // ReadRange returns the range of valid values that the input can return. For Button
-// inputs,this is always [0, 1], where 0 represents not pressed and 1 represents pressed.
+// inputs, this is always [0, 1], where 0 represents not pressed and 1 represents pressed.
 func (b Button) ReadRange() [2]int {
 	return [2]int{0, 1}
 }
 
-// Read returns the current state of the button, where 0 represents not pressed 
+// Read returns the current state of the button, where 0 represents not pressed
 // and 1 represents pressed.
 func (b Button) Read() (int, error) {
-	return 0, nil
+	msg := message.InputCmd{
+		DeviceIndex:  b.Device().Index,
+		FeatureIndex: b.Index(),
+		Type:         string(b.InputType()),
+		Command:      "Read",
+	}
+	reading, err := b.device.msgSender.SendRecv(&msg)
+	if err != nil {
+		return 0, err
+	}
+	if reading, ok := reading.(*message.InputReading); ok {
+		if reading.Reading.Button != nil {
+			return reading.Reading.Button.Value, nil
+		}
+		return 0, fmt.Errorf("unexpected input reading type for button input: %v", reading.Reading)
+	}
+	return 0, fmt.Errorf("unexpected message type for button input reading: %T", reading)
 }
 
 // IsPressed returns true if the button is currently pressed, and false otherwise.

@@ -4,9 +4,9 @@ import (
 	"github.com/CockpitCutie/buttplug-go/message"
 )
 
-// Device represents a physical device that can be controlled by the Buttplug server. 
-// It contains information about the device's name, index, display name, and its 
-// features. Hardware controls can be performed by accessing specific 
+// Device represents a physical device that can be controlled by the Buttplug server.
+// It contains information about the device's name, index, display name, and its
+// features. Hardware controls can be performed by accessing specific
 // inputs and outputs of the device, such as vibrators, rotators, buttons, etc.
 type Device struct {
 	Name             string
@@ -18,7 +18,7 @@ type Device struct {
 	msgSender        messageSender
 }
 
-// messageSender is a minimal interface for sending messages to the server, 
+// messageSender is a minimal interface for sending messages to the server,
 // used internally by Device for sending commands.
 type messageSender interface {
 	SendRecv(message.Message) (message.Message, error)
@@ -26,7 +26,7 @@ type messageSender interface {
 
 // ----- Device Constructors -----
 
-// FromDeviceList creates a list of Device instances from a DeviceList message 
+// FromDeviceList creates a list of Device instances from a DeviceList message
 // received from the server.
 func FromDeviceList(devlist *message.DeviceList, sender messageSender) ([]Device, error) {
 	var devices []Device
@@ -65,15 +65,15 @@ func newDevice(msg message.Device, msgSender messageSender) (Device, error) {
 
 // ----- Stop Commands -----
 
-// Stop stops all inputs and outputs for the device. 
+// Stop stops all inputs and outputs for the device.
 // It returns an error if the stop command fails or if sending a message to the
 // server fails (for example if the connection was dropped).
 func (d Device) Stop() error {
 	t := true // to get an address for *bool
 	stopMsg := message.StopCmd{
 		DeviceIndex: d.Index,
-		Inputs: &t,
-		Outputs: &t,
+		Inputs:      &t,
+		Outputs:     &t,
 	}
 	_, err := d.msgSender.SendRecv(&stopMsg)
 	return err
@@ -83,12 +83,12 @@ func (d Device) Stop() error {
 // It returns an error if the stop command fails or if sending a message to the
 // server fails (for example if the connection was dropped).
 func (d Device) StopInputs() error {
-	t := true // to get an address for *bool
+	t := true  // to get an address for *bool
 	f := false // to get an address for *bool
 	stopMsg := message.StopCmd{
 		DeviceIndex: d.Index,
-		Inputs: &t,
-		Outputs: &f,
+		Inputs:      &t,
+		Outputs:     &f,
 	}
 	_, err := d.msgSender.SendRecv(&stopMsg)
 	return err
@@ -98,12 +98,12 @@ func (d Device) StopInputs() error {
 // It returns an error if the stop command fails or if sending a message to the
 // server fails (for example if the connection was dropped).
 func (d Device) StopOutputs() error {
-	t := true // to get an address for *bool
+	t := true  // to get an address for *bool
 	f := false // to get an address for *bool
 	stopMsg := message.StopCmd{
 		DeviceIndex: d.Index,
-		Inputs: &f,
-		Outputs: &t,
+		Inputs:      &f,
+		Outputs:     &t,
 	}
 	_, err := d.msgSender.SendRecv(&stopMsg)
 	return err
@@ -136,7 +136,7 @@ func (d Device) Rotators() []Rotator {
 }
 
 // RotatorsWithDirection returns a list of all output features with RotateWithDirection
-// capabilities. It returns a nil slice if the device contains no rotating outputs 
+// capabilities. It returns a nil slice if the device contains no rotating outputs
 // with direction.
 func (d Device) RotatorsWithDirection() []RotatorWithDirection {
 	var outputs []RotatorWithDirection
@@ -209,7 +209,7 @@ func (d Device) Positioners() []Position {
 }
 
 // PositionersWithDuration returns a list of all output features with PositionWithDuration
-// capabilities. It returns a nil slice if the device contains no positioning 
+// capabilities. It returns a nil slice if the device contains no positioning
 // outputs with duration.
 func (d Device) PositionersWithDuration() []PositionWithDuration {
 	var outputs []PositionWithDuration
@@ -275,9 +275,9 @@ func (d Device) Buttons() []Button {
 
 // Feature represents a common interface for a hardware controllable component
 // of a device, such as a vibrator, rotator, button, etc. It is common between
-// inputs and outputs. It provides methods to access the feature's description, 
-// index, and parent device. 
-// 
+// inputs and outputs. It provides methods to access the feature's description,
+// index, and parent device.
+//
 // This interface is intended to share behavior and functionality between inputs
 // and outputs, not necessarily to be used on its own.
 type Feature interface {
@@ -294,14 +294,14 @@ type feature struct {
 	device      *Device
 }
 
-// Description returns a human readable description of the feature, such as 
+// Description returns a human readable description of the feature, such as
 // "Clitoral Stimulator" or "Battery".
 func (f feature) Description() string {
 	return f.description
 }
 
-// Index returns the feature index of the feature, which is used to identify 
-// the feature when paired with the device index, and is used for sending 
+// Index returns the feature index of the feature, which is used to identify
+// the feature when paired with the device index, and is used for sending
 // commands to control a specific feature.
 func (f feature) Index() int {
 	return f.index
@@ -309,7 +309,7 @@ func (f feature) Index() int {
 
 // Device returns a pointer to the parent device of the feature. This can be used
 // to access the device's name, index, and other Device methods.
-// 
+//
 // This is used internally for sending commands to the server, since the device
 // contains the handle for message sending.
 func (f feature) Device() *Device {

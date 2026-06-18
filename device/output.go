@@ -23,7 +23,7 @@ const (
 	HeaterOutput                OutputType = "Heater"
 	LEDOutput                   OutputType = "Led"
 	PositionOutput              OutputType = "Position"
-	PositionWithDurationOutput OutputType = "PositionWithDuration"
+	PositionWithDurationOutput  OutputType = "PositionWithDuration"
 )
 
 func (d *Device) registerOutputs(features message.DeviceFeatures) error {
