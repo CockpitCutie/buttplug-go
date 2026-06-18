@@ -102,7 +102,7 @@ func outputFromProps(kind OutputType, properties message.DeviceOutput, feature f
 
 type Vibrator struct {
 	feature
-	stepCount int
+	stepRange [2]int
 }
 
 func (v Vibrator) OutputType() OutputType {
@@ -110,6 +110,10 @@ func (v Vibrator) OutputType() OutputType {
 }
 
 func (v Vibrator) Activate(speedStep int) error {
+	stepIsInRange := speedStep == 0 || (speedStep > v.stepRange[0] && speedStep < v.stepRange[1])
+	if !stepIsInRange {
+		return fmt.Errorf("speed step %d is out of range for this vibrator", speedStep)
+	}
 	msg := message.OutputCmd{
 		DeviceIndex:  v.Device().Index,
 		FeatureIndex: v.Index(),
