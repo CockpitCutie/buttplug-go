@@ -12,8 +12,8 @@ type Error struct {
 	Code    ErrorCode `json:"ErrorCode"`
 }
 
-func (e Error) Error() error {
-	return fmt.Errorf("buttplug %s on message %d: %s", e.Code.String(), e.Id, e.Message)
+func (e Error) Error() string {
+	return fmt.Sprintf("buttplug %s on message %d: %s", e.Code.String(), e.Id, e.Message)
 }
 
 type ErrorCode int

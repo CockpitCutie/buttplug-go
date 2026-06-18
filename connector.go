@@ -116,7 +116,7 @@ func (w *WebsocketConnector) SendRecv(m message.Message) (message.Message, error
 func (w *WebsocketConnector) recv(id int) (message.Message, error) {
 	msg := <-w.msgRecv[id]
 	if err, ok := msg.(*message.Error); ok {
-		return err, err.Error()
+		return err, err
 	}
 	delete(w.msgRecv, id)
 	return msg, nil
