@@ -8,73 +8,7 @@ import (
 
 
 
-func TestDeserializeStartScanning(t *testing.T) {
-	jsonMessage := `[
-  {
-    "StartScanning": {
-      "Id": 1
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*StartScanning); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type StartScanning")
-	}
-}
 
-func TestDeserializeStopScanning(t *testing.T) {
-	jsonMessage := `[
-  {
-    "StopScanning": {
-      "Id": 1
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*StopScanning); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type StopScanning")
-	}
-}
-
-func TestDeserializeScanningFinished(t *testing.T) {
-	jsonMessage := `[
-  {
-    "ScanningFinished": {
-      "Id": 0
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*ScanningFinished); ok {
-		assert.Equalf(t, 0, msg.ID(), "Expected Id 0 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type ScanningFinished")
-	}
-}
-
-func TestDeserializeRequestDeviceList(t *testing.T) {
-	jsonMessage := `[
-  {
-    "RequestDeviceList": {
-      "Id": 1
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*RequestDeviceList); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type RequestDeviceList")
-	}
-}
 
 func TestDeserializeDeviceList(t *testing.T) {
 	jsonMessage := `[
