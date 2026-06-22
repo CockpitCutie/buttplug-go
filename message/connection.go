@@ -14,3 +14,7 @@ type ServerInfo struct {
 	ProtocolVersionMajor int
 	ProtocolVersionMinor int
 }
+
+type Disconnect struct {
+	message
+}
