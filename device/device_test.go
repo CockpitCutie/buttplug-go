@@ -49,12 +49,12 @@ var featuresMsg = message.DeviceFeatures{
 
 func TestRegisterOutputs(t *testing.T) {
 	d := &Device{
-		Name:    "Test Vibrator",
-		Index:   0,
+		name:    "Test Vibrator",
+		index:   0,
 	}
 	err := d.registerOutputs(featuresMsg)
 	assert.NoError(t, err)
-	assert.Len(t, d.Outputs, 3)
+	assert.Len(t, d.Outputs(), 3)
 
 	out0 := d.GetFeatureById(0).(Output)
 	assert.IsType(t, Vibrator{}, out0)
@@ -77,12 +77,12 @@ func TestRegisterOutputs(t *testing.T) {
 
 func TestRegisterInputs(t *testing.T) {
 	d := &Device{
-		Name:    "Test Vibrator",
-		Index:   0,
+		name:    "Test Vibrator",
+		index:   0,
 	}
 	err := d.registerInputs(featuresMsg)
 	assert.NoError(t, err)
-	assert.Len(t, d.Inputs, 1)
+	assert.Len(t, d.inputs, 1)
 
 	in3 := d.GetFeatureById(3).(Input)
 	assert.IsType(t, Battery{}, in3)

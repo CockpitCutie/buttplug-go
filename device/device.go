@@ -9,12 +9,12 @@ import (
 // features. Hardware controls can be performed by accessing specific
 // inputs and outputs of the device, such as vibrators, rotators, buttons, etc.
 type Device struct {
-	Name             string
-	Index            int
-	MessageTimingGap int
-	DisplayName      string
-	Inputs           []Input
-	Outputs          []Output
+	name             string
+	index            int
+	messageTimingGap int
+	displayName      string
+	inputs           []Input
+	outputs          []Output
 	msgSender        messageSender
 }
 
@@ -43,13 +43,13 @@ func FromDeviceList(devlist *message.DeviceList, sender messageSender) ([]Device
 // newDevice creates a Device instance from a Device message received from the server.
 func newDevice(msg message.Device, msgSender messageSender) (Device, error) {
 	device := Device{
-		Name:             msg.DeviceName,
-		Index:            msg.DeviceIndex,
-		MessageTimingGap: msg.DeviceMessageTimingGap,
-		DisplayName:      msg.DeviceDisplayName,
+		name:             msg.DeviceName,
+		index:            msg.DeviceIndex,
+		messageTimingGap: msg.DeviceMessageTimingGap,
+		displayName:      msg.DeviceDisplayName,
 		msgSender:        msgSender,
-		Inputs:           nil,
-		Outputs:          nil,
+		inputs:           nil,
+		outputs:          nil,
 	}
 	err := device.registerOutputs(msg.DeviceFeatures)
 	if err != nil {
@@ -71,7 +71,7 @@ func newDevice(msg message.Device, msgSender messageSender) (Device, error) {
 func (d Device) Stop() error {
 	t := true // to get an address for *bool
 	stopMsg := message.StopCmd{
-		DeviceIndex: d.Index,
+		DeviceIndex: d.index,
 		Inputs:      &t,
 		Outputs:     &t,
 	}
@@ -86,7 +86,7 @@ func (d Device) StopInputs() error {
 	t := true  // to get an address for *bool
 	f := false // to get an address for *bool
 	stopMsg := message.StopCmd{
-		DeviceIndex: d.Index,
+		DeviceIndex: d.index,
 		Inputs:      &t,
 		Outputs:     &f,
 	}
@@ -101,7 +101,7 @@ func (d Device) StopOutputs() error {
 	t := true  // to get an address for *bool
 	f := false // to get an address for *bool
 	stopMsg := message.StopCmd{
-		DeviceIndex: d.Index,
+		DeviceIndex: d.index,
 		Inputs:      &f,
 		Outputs:     &t,
 	}
@@ -109,16 +109,39 @@ func (d Device) StopOutputs() error {
 	return err
 }
 
-// ----- Output Accessors -----
+// ----- Device Accessors -----
+
+// Name returns the name of the device, which is a human readable string describing
+// the device, such as "Lovense Lush". This is not guaranteed to be unique between 
+// devices.
+func (d Device) Name() string {
+	return d.name	
+}
+
+// Index returns the index of the device, which is used to identify the
+// device when sending commands to the server. This is guaranteed to be unique
+// between devices, but may not be consistent across different connections to
+// the server, so it should not be used for long term storage or identification
+// of a device.
+func (d Device) Index() int {
+	return d.index	
+}
+
+// DisplayName returns a user provided display name for a device. Useful for cases
+// where a user may have multiple of the same device connected. DisplayName returns
+// an empty string if no display name has been set for the device.
+func (d Device) DisplayName() string {
+	return d.displayName	
+}
 
 // Features returns a list of all features for the device, including both inputs
 // and outputs. It returns a nil slice if the device contains no features.
 func (d Device) Features() []Feature {
 	var features []Feature
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		features = append(features, output)
 	}
-	for _, input := range d.Inputs {
+	for _, input := range d.inputs {
 		features = append(features, input)
 	}
 	return features
@@ -138,11 +161,19 @@ func (d Device) GetFeatureById(id int) Feature {
 	return nil
 }
 
+// ----- Output Accessors -----
+
+// Outputs returns a list of all output features for the device. It returns a nil
+// slice if the device contains no output features.
+func (d Device) Outputs() []Output {
+	return d.outputs
+}
+
 // Vibrators returns a list of all output features with Vibrate capabilities.
 // It returns a nil slice if the device contains no vibrating outputs.
 func (d Device) Vibrators() []Vibrator {
 	var outputs []Vibrator
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Vibrator); ok {
 			outputs = append(outputs, output)
 		}
@@ -154,7 +185,7 @@ func (d Device) Vibrators() []Vibrator {
 // It returns a nil slice if the device contains no rotating outputs.
 func (d Device) Rotators() []Rotator {
 	var outputs []Rotator
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Rotator); ok {
 			outputs = append(outputs, output)
 		}
@@ -167,7 +198,7 @@ func (d Device) Rotators() []Rotator {
 // with direction.
 func (d Device) RotatorsWithDirection() []RotatorWithDirection {
 	var outputs []RotatorWithDirection
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(RotatorWithDirection); ok {
 			outputs = append(outputs, output)
 		}
@@ -179,7 +210,7 @@ func (d Device) RotatorsWithDirection() []RotatorWithDirection {
 // It returns a nil slice if the device contains no oscillating outputs.
 func (d Device) Oscillators() []Oscillator {
 	var outputs []Oscillator
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Oscillator); ok {
 			outputs = append(outputs, output)
 		}
@@ -191,7 +222,7 @@ func (d Device) Oscillators() []Oscillator {
 // It returns a nil slice if the device contains no constricting outputs.
 func (d Device) Constrictors() []Constrictor {
 	var outputs []Constrictor
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Constrictor); ok {
 			outputs = append(outputs, output)
 		}
@@ -203,7 +234,7 @@ func (d Device) Constrictors() []Constrictor {
 // It returns a nil slice if the device contains no heating outputs.
 func (d Device) Heaters() []Heater {
 	var outputs []Heater
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Heater); ok {
 			outputs = append(outputs, output)
 		}
@@ -215,7 +246,7 @@ func (d Device) Heaters() []Heater {
 // It returns a nil slice if the device contains no lighting outputs.
 func (d Device) LEDs() []LED {
 	var outputs []LED
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(LED); ok {
 			outputs = append(outputs, output)
 		}
@@ -227,7 +258,7 @@ func (d Device) LEDs() []LED {
 // It returns a nil slice if the device contains no positioning outputs.
 func (d Device) Positioners() []Position {
 	var outputs []Position
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(Position); ok {
 			outputs = append(outputs, output)
 		}
@@ -240,7 +271,7 @@ func (d Device) Positioners() []Position {
 // outputs with duration.
 func (d Device) PositionersWithDuration() []PositionWithDuration {
 	var outputs []PositionWithDuration
-	for _, output := range d.Outputs {
+	for _, output := range d.Outputs() {
 		if output, ok := output.(PositionWithDuration); ok {
 			outputs = append(outputs, output)
 		}
@@ -250,11 +281,15 @@ func (d Device) PositionersWithDuration() []PositionWithDuration {
 
 // ----- Input Accessors -----
 
+func (d Device) Inputs() []Input {
+	return d.inputs	
+}
+
 // Batteries returns a list of all input features with Battery capabilities.
 // It returns a nil slice if the device contains no battery level inputs.
 func (d Device) Batteries() []Battery {
 	var inputs []Battery
-	for _, input := range d.Inputs {
+	for _, input := range d.inputs {
 		if input, ok := input.(Battery); ok {
 			inputs = append(inputs, input)
 		}
@@ -266,7 +301,7 @@ func (d Device) Batteries() []Battery {
 // It returns a nil slice if the device contains no RSSI inputs.
 func (d Device) RSSIs() []RSSI {
 	var inputs []RSSI
-	for _, input := range d.Inputs {
+	for _, input := range d.inputs {
 		if input, ok := input.(RSSI); ok {
 			inputs = append(inputs, input)
 		}
@@ -278,7 +313,7 @@ func (d Device) RSSIs() []RSSI {
 // It returns a nil slice if the device contains no pressure inputs.
 func (d Device) Pressures() []Pressure {
 	var inputs []Pressure
-	for _, input := range d.Inputs {
+	for _, input := range d.inputs {
 		if input, ok := input.(Pressure); ok {
 			inputs = append(inputs, input)
 		}
@@ -290,7 +325,7 @@ func (d Device) Pressures() []Pressure {
 // It returns a nil slice if the device contains no button inputs.
 func (d Device) Buttons() []Button {
 	var inputs []Button
-	for _, input := range d.Inputs {
+	for _, input := range d.inputs {
 		if input, ok := input.(Button); ok {
 			inputs = append(inputs, input)
 		}

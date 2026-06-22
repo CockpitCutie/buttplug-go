@@ -50,7 +50,7 @@ func (d *Device) registerInputs(features message.DeviceFeatures) error {
 			if err != nil {
 				return err
 			}
-			d.Inputs = append(d.Inputs, input)
+			d.inputs = append(d.inputs, input)
 		}
 
 	}
@@ -81,7 +81,7 @@ func inputFromProps(kind InputType, properties message.DeviceInput, feature feat
 // fails, or the received message is not of the expected type.
 func (d Device) readInput(input Input) (*message.InputReading, error) {
 	msg := message.InputCmd{
-		DeviceIndex:  d.Index,
+		DeviceIndex:  d.index,
 		FeatureIndex: input.Index(),
 		Type:         string(input.InputType()),
 		Command:      "Read",
