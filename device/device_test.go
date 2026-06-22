@@ -1,7 +1,6 @@
 package device
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/CockpitCutie/buttplug-go/message"
@@ -57,20 +56,23 @@ func TestRegisterOutputs(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, d.Outputs, 3)
 
-	assert.IsType(t, Vibrator{}, d.Outputs[0])
-	assert.Equal(t, 0, d.Outputs[0].Index())
-	assert.Equal(t, "Clitoral Stimulator", d.Outputs[0].Description())
-	assert.Equal(t, VibrateOutput, d.Outputs[0].OutputType())
+	out0 := d.GetFeatureById(0).(Output)
+	assert.IsType(t, Vibrator{}, out0)
+	assert.Equal(t, 0, out0.Index())
+	assert.Equal(t, "Clitoral Stimulator", out0.Description())
+	assert.Equal(t, VibrateOutput, out0.OutputType())
 
-	assert.IsType(t, Vibrator{}, d.Outputs[1])
-	assert.Equal(t, 1, d.Outputs[1].Index())
-	assert.Equal(t, "Insertable Stimulator", d.Outputs[1].Description())
-	assert.Equal(t, VibrateOutput, d.Outputs[1].OutputType())
+	out1 := d.GetFeatureById(1).(Output)
+	assert.IsType(t, Vibrator{}, out1)
+	assert.Equal(t, 1, out1.Index())
+	assert.Equal(t, "Insertable Stimulator", out1.Description())
+	assert.Equal(t, VibrateOutput, out1.OutputType())
 
-	assert.IsType(t, RotatorWithDirection{}, d.Outputs[2])
-	assert.Equal(t, 2, d.Outputs[2].Index())
-	assert.Equal(t, "Rotating Head with Directional Control", d.Outputs[2].Description())
-	assert.Equal(t, RotationWithDirectionOutput, d.Outputs[2].OutputType())
+	out2 := d.GetFeatureById(2).(Output)
+	assert.IsType(t, RotatorWithDirection{}, out2)
+	assert.Equal(t, 2, out2.Index())
+	assert.Equal(t, "Rotating Head with Directional Control", out2.Description())
+	assert.Equal(t, RotationWithDirectionOutput, out2.OutputType())
 }
 
 func TestRegisterInputs(t *testing.T) {
@@ -82,8 +84,9 @@ func TestRegisterInputs(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, d.Inputs, 1)
 
-	assert.IsType(t, Battery{}, d.Inputs[3])
-	assert.Equal(t, 3, d.Inputs[3].Index())
-	assert.Equal(t, "Battery", d.Inputs[3].Description())
-	assert.Equal(t, BatteryInput, d.Inputs[3].InputType())
+	in3 := d.GetFeatureById(3).(Input)
+	assert.IsType(t, Battery{}, in3)
+	assert.Equal(t, 3, in3.Index())
+	assert.Equal(t, "Battery", in3.Description())
+	assert.Equal(t, BatteryInput, in3.InputType())
 }
