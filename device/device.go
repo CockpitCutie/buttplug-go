@@ -111,6 +111,33 @@ func (d Device) StopOutputs() error {
 
 // ----- Output Accessors -----
 
+// Features returns a list of all features for the device, including both inputs
+// and outputs. It returns a nil slice if the device contains no features.
+func (d Device) Features() []Feature {
+	var features []Feature
+	for _, output := range d.Outputs {
+		features = append(features, output)
+	}
+	for _, input := range d.Inputs {
+		features = append(features, input)
+	}
+	return features
+}
+
+// GetFeatureById takes a feature index and returns the corresponding Feature
+// from the device's features. It returns nil if no feature with the given 
+// index is found. This returns features from both the device's inputs and
+// outputs, so returned results will need to be type asserted to be used as 
+// a specific input or output type.
+func (d Device) GetFeatureById(id int) Feature {
+	for _, feature := range d.Features() {
+		if feature.Index() == id {
+			return feature
+		}
+	}
+	return nil
+}
+
 // Vibrators returns a list of all output features with Vibrate capabilities.
 // It returns a nil slice if the device contains no vibrating outputs.
 func (d Device) Vibrators() []Vibrator {
