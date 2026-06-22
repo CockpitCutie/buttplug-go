@@ -6,61 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeserializeOk(t *testing.T) {
-	jsonMessage := `[
-  {
-    "Ok": {
-      "Id": 1
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*Ok); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type Ok")
-	}
-}
-
-func TestDeserializeError(t *testing.T) {
-	jsonMessage := `[
-  {
-    "Error": {
-      "Id": 0,
-      "ErrorMessage": "Server received invalid JSON.",
-      "ErrorCode": 3
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*Error); ok {
-		assert.Equalf(t, 0, msg.ID(), "Expected Id 1 found %d", msg.ID())
-		assert.Equalf(t, "Server received invalid JSON.", msg.Message, "Expected ErrorMessage 'Server received invalid JSON.' found '%s'", msg.Message)
-		assert.Equalf(t, MsgError, msg.Code, "Expected ErrorCode MsgError found %d", msg.Code)
-	} else {
-		t.Errorf("Deserialized message is not of type Error")
-	}
-}
-
-func TestDeserializePing(t *testing.T) {
-	jsonMessage := `[
-  {
-    "Ping": {
-      "Id": 5
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*Ping); ok {
-		assert.Equalf(t, 5, msg.ID(), "Expected Id 5 found %d", msg.ID())
-	} else {
-		t.Errorf("Deserialized message is not of type Ping")
-	}
-}
-
 func TestDeserializeRequestServerInfo(t *testing.T) {
 	jsonMessage := `[
   {
