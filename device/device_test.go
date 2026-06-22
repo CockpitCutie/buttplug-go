@@ -49,8 +49,8 @@ var featuresMsg = message.DeviceFeatures{
 
 func TestRegisterOutputs(t *testing.T) {
 	d := &Device{
-		name:    "Test Vibrator",
-		index:   0,
+		name:  "Test Vibrator",
+		index: 0,
 	}
 	err := d.registerOutputs(featuresMsg)
 	assert.NoError(t, err)
@@ -77,8 +77,8 @@ func TestRegisterOutputs(t *testing.T) {
 
 func TestRegisterInputs(t *testing.T) {
 	d := &Device{
-		name:    "Test Vibrator",
-		index:   0,
+		name:  "Test Vibrator",
+		index: 0,
 	}
 	err := d.registerInputs(featuresMsg)
 	assert.NoError(t, err)

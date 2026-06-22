@@ -112,10 +112,10 @@ func (d Device) StopOutputs() error {
 // ----- Device Accessors -----
 
 // Name returns the name of the device, which is a human readable string describing
-// the device, such as "Lovense Lush". This is not guaranteed to be unique between 
+// the device, such as "Lovense Lush". This is not guaranteed to be unique between
 // devices.
 func (d Device) Name() string {
-	return d.name	
+	return d.name
 }
 
 // Index returns the index of the device, which is used to identify the
@@ -124,14 +124,14 @@ func (d Device) Name() string {
 // the server, so it should not be used for long term storage or identification
 // of a device.
 func (d Device) Index() int {
-	return d.index	
+	return d.index
 }
 
 // DisplayName returns a user provided display name for a device. Useful for cases
 // where a user may have multiple of the same device connected. DisplayName returns
 // an empty string if no display name has been set for the device.
 func (d Device) DisplayName() string {
-	return d.displayName	
+	return d.displayName
 }
 
 // Features returns a list of all features for the device, including both inputs
@@ -148,9 +148,9 @@ func (d Device) Features() []Feature {
 }
 
 // GetFeatureById takes a feature index and returns the corresponding Feature
-// from the device's features. It returns nil if no feature with the given 
+// from the device's features. It returns nil if no feature with the given
 // index is found. This returns features from both the device's inputs and
-// outputs, so returned results will need to be type asserted to be used as 
+// outputs, so returned results will need to be type asserted to be used as
 // a specific input or output type.
 func (d Device) GetFeatureById(id int) Feature {
 	for _, feature := range d.Features() {
@@ -282,7 +282,7 @@ func (d Device) PositionersWithDuration() []PositionWithDuration {
 // ----- Input Accessors -----
 
 func (d Device) Inputs() []Input {
-	return d.inputs	
+	return d.inputs
 }
 
 // Batteries returns a list of all input features with Battery capabilities.
