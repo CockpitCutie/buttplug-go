@@ -68,6 +68,10 @@ func Deserialize(b []byte) ([]Message, error) {
 				var serverInfo ServerInfo
 				err = json.Unmarshal(value, &serverInfo)
 				msgs = append(msgs, &serverInfo)
+			case "Disconnect":
+				var disconnect Disconnect
+				err = json.Unmarshal(value, &disconnect)
+				msgs = append(msgs, &disconnect)
 			case "StartScanning":
 				var startScan StartScanning
 				err = json.Unmarshal(value, &startScan)
