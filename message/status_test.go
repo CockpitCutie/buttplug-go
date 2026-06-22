@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSerializeOkDocExample(t *testing.T) {
+const OkDocExample = `[{"Ok":{"Id":1}}]`
+
+func TestSerialize_Ok_DocExample(t *testing.T) {
 	msg := Ok{
 		message: message{
 			Id: 1,
@@ -14,18 +16,12 @@ func TestSerializeOkDocExample(t *testing.T) {
 	}
 	jsonMsg, err := Serialize(&msg)
 	assert.NoErrorf(t, err, "Error serializing message")
-	expectedJson := `[{"Ok":{"Id":1}}]`
+	expectedJson := OkDocExample
 	assert.Equalf(t, expectedJson, jsonMsg, "Serialized message does not match expected JSON")
 }
 
-func TestDeserializeOkDocExample(t *testing.T) {
-	jsonMessage := `[
-  {
-    "Ok": {
-      "Id": 1
-    }
-  }
-]`
+func TestDeserialize_Ok_DocExample(t *testing.T) {
+	jsonMessage := OkDocExample
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Ok); ok {
@@ -35,7 +31,9 @@ func TestDeserializeOkDocExample(t *testing.T) {
 	}
 }
 
-func TestSerializeErrorDocExample(t *testing.T) {
+const ErrorDocExample = `[{"Error":{"Id":0,"ErrorMessage":"Server received invalid JSON.","ErrorCode":3}}]`
+
+func TestSerialize_Error_DocExample(t *testing.T) {
 	msg := Error{
 		message: message{
 			Id: 0,
@@ -45,12 +43,12 @@ func TestSerializeErrorDocExample(t *testing.T) {
 	}
 	jsonMsg, err := Serialize(&msg)
 	assert.NoErrorf(t, err, "Error serializing message")
-	expectedJson := `[{"Error":{"Id":0,"ErrorMessage":"Server received invalid JSON.","ErrorCode":3}}]`
+	expectedJson := ErrorDocExample
 	assert.Equalf(t, expectedJson, jsonMsg, "Serialized message does not match expected JSON")
 }
 
-func TestDeserializeErrorDocExample(t *testing.T) {
-	jsonMessage := `[{"Error":{"Id":0,"ErrorMessage":"Server received invalid JSON.","ErrorCode":3}}]`
+func TestDeserialize_Error_DocExample(t *testing.T) {
+	jsonMessage := ErrorDocExample
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Error); ok {
@@ -62,7 +60,9 @@ func TestDeserializeErrorDocExample(t *testing.T) {
 	}
 }
 
-func TestSerializePingDocExample(t *testing.T) {
+const PingDocExample = `[{"Ping":{"Id":5}}]`
+
+func TestSerialize_Ping_DocExample(t *testing.T) {
 	msg := Ping{
 		message: message{
 			Id: 5,
@@ -70,12 +70,12 @@ func TestSerializePingDocExample(t *testing.T) {
 	}
 	jsonMsg, err := Serialize(&msg)
 	assert.NoErrorf(t, err, "Error serializing message")
-	expectedJson := `[{"Ping":{"Id":5}}]`
+	expectedJson := PingDocExample
 	assert.Equalf(t, expectedJson, jsonMsg, "Serialized message does not match expected JSON")
 }
 
-func TestDeserializePingDocExample(t *testing.T) {
-	jsonMessage := `[{"Ping":{"Id":5}}]`
+func TestDeserialize_Ping_DocExample(t *testing.T) {
+	jsonMessage := PingDocExample
 	msg, err := Deserialize([]byte(jsonMessage))
 	assert.NoErrorf(t, err, "Error deserializing message")
 	if msg, ok := msg[0].(*Ping); ok {

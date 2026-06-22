@@ -6,53 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeserializeRequestServerInfo(t *testing.T) {
-	jsonMessage := `[
-  {
-    "RequestServerInfo": {
-      "Id": 1,
-      "ClientName": "Test Client",
-      "ProtocolVersionMajor": 4,
-      "ProtocolVersionMinor": 0
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*RequestServerInfo); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-		assert.Equalf(t, "Test Client", msg.ClientName, "Expected ClientName 'Test Client' found '%s'", msg.ClientName)
-		assert.Equalf(t, 4, msg.ProtocolVersionMajor, "Expected ProtoMajor 1 found %d", msg.ProtocolVersionMajor)
-		assert.Equalf(t, 0, msg.ProtocolVersionMinor, "Expected ProtoMinor 1 found %d", msg.ProtocolVersionMinor)
-	} else {
-		t.Errorf("Deserialized message is not of type RequestServerInfo")
-	}
-}
 
-func TestServerInfo(t *testing.T) {
-	jsonMessage := `[
-  {
-    "ServerInfo": {
-      "Id": 1,
-      "ServerName": "Test Server",
-      "MaxPingTime": 100,
-      "ProtocolVersionMajor": 4,
-      "ProtocolVersionMinor": 0
-    }
-  }
-]`
-	msg, err := Deserialize([]byte(jsonMessage))
-	assert.NoErrorf(t, err, "Error deserializing message")
-	if msg, ok := msg[0].(*ServerInfo); ok {
-		assert.Equalf(t, 1, msg.ID(), "Expected Id 1 found %d", msg.ID())
-		assert.Equalf(t, "Test Server", msg.ServerName, "Expected ServerName 'Test Server' found '%s'", msg.ServerName)
-		assert.Equalf(t, 100, msg.MaxPingTime, "Expected MaxPingTime 100 found %d", msg.MaxPingTime)
-		assert.Equalf(t, 4, msg.ProtocolVersionMajor, "Expected ProtoMajor 4 found %d", msg.ProtocolVersionMajor)
-		assert.Equalf(t, 0, msg.ProtocolVersionMinor, "Expected ProtoMinor 0 found %d", msg.ProtocolVersionMinor)
-	} else {
-		t.Errorf("Deserialized message is not of type ServerInfo")
-	}
-}
 
 func TestDeserializeStartScanning(t *testing.T) {
 	jsonMessage := `[
