@@ -28,14 +28,21 @@ func (m message) IsServerEvent() bool {
 	return m.Id == 0
 }
 
-func Serialize(m Message) (string, error) {
-	// get name of specific message type for json key
-	messageKind := reflect.TypeOf(m).Elem().Name()
-	serialized, err := json.Marshal(m)
+func Serialize[T Message](m ...T) (string, error) {
+	var msgs []map[string]json.RawMessage
+	for _, msg := range m {
+		messageKind := reflect.TypeOf(msg).Elem().Name()
+		serialized, err := json.Marshal(msg)
+		if err != nil {
+			return "", err
+		}
+		msgs = append(msgs, map[string]json.RawMessage{messageKind: serialized})
+	}
+	serialized, err := json.Marshal(msgs)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf(`[{"%s":%s}]`, messageKind, string(serialized)), nil
+	return string(serialized), nil
 }
 
 func Deserialize(b []byte) ([]Message, error) {
@@ -104,6 +111,10 @@ func Deserialize(b []byte) ([]Message, error) {
 				var outputCmd OutputCmd
 				err = json.Unmarshal(value, &outputCmd)
 				msgs = append(msgs, &outputCmd)
+			case "InputCmd":
+				var inputCmd InputCmd
+				err = json.Unmarshal(value, &inputCmd)
+				msgs = append(msgs, &inputCmd)
 			case "InputReading":
 				var inputReading InputReading
 				err = json.Unmarshal(value, &inputReading)
